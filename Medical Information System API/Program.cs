@@ -10,14 +10,12 @@ using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Pathnostics", Version = "v1" });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
         In = ParameterLocation.Header,
         Description = "Please enter token",
@@ -40,9 +38,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-    .AddEntityFrameworkStores<DataContext>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,12 +51,12 @@ using var serviceScope = app.Services.CreateScope();
 var context = serviceScope.ServiceProvider.GetService<DataContext>();
 context?.Database.Migrate();
 
-app.MapIdentityApi<Doctor>();
-
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseRouting();
 app.MapControllers();
 
 app.Run();
