@@ -17,14 +17,13 @@ namespace Medical_Information_System_API.Controllers
         [HttpPost("register")]
         public IActionResult Get([FromBody] DoctorRegisterModel doctorDTO)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return Ok();
+                return BadRequest();
             }
             else
             {
-                _logger.LogError("err");
-                return BadRequest();
+                return Ok();
             }
         }
     }
