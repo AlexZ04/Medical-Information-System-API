@@ -31,6 +31,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+var db = new DatabaseManager();
+db.CreateDatabase("mis_db");
+
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(connection));
