@@ -1,13 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Medical_Information_System_API.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Medical_Information_System_API.Classes;
 
 var builder = WebApplication.CreateBuilder(args);
