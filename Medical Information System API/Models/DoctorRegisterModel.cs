@@ -20,6 +20,6 @@ namespace Medical_Information_System_API.Models
         [Phone]
         [AllowNull]
         public string Phone { get; set; }
-        public Guid Speciality { get; set; } // ???
+        public Guid Speciality { get; set; }
     }
 }

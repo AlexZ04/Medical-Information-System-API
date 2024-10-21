@@ -7,7 +7,7 @@ namespace Medical_Information_System_API.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) 
         { 
-
         }
+
     }
 }
