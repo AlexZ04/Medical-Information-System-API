@@ -12,6 +12,7 @@ namespace Medical_Information_System_API.Data
         }
 
         public DbSet<DoctorDatabase> Doctors { get; set; }
+        //public DbSet<TokenResponseModel> TokenBlackList { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

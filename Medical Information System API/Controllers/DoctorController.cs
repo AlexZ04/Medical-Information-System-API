@@ -106,8 +106,32 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpPut("profile")]
         [Authorize]
-        public async Task<IActionResult> EditProfile()
+        public async Task<IActionResult> EditProfile([FromBody] DoctorEditModel newDoctor)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
+
+            if (loginnedDoctor == null)
+            {
+                return Unauthorized();
+            }
+
+            loginnedDoctor.Email = newDoctor.Email;
+            loginnedDoctor.Name = newDoctor.Name;
+            loginnedDoctor.Birthday = newDoctor.Birthday;
+            loginnedDoctor.Gender = newDoctor.Gender;
+            loginnedDoctor.Phone = newDoctor.Phone;
+
+            _context.SaveChanges();
+
+            loginnedDoctor.Password = "";
+
             return Ok();
         }
     }
