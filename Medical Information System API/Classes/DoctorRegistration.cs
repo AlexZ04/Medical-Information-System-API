@@ -1,6 +1,7 @@
 ﻿using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel;
+using System.Web.Helpers;
 
 namespace Medical_Information_System_API.Classes
 {
@@ -25,7 +26,7 @@ namespace Medical_Information_System_API.Classes
 
         public DoctorDatabase(DoctorRegisterModel registerModel)
         {
-            Password = registerModel.Password;
+            Password = Crypto.HashPassword(registerModel.Password);
             Name = registerModel.Name;
             Birthday = registerModel.Birthday;
             Gender = registerModel.Gender;

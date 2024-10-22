@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Validations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-
+using System.Web.Helpers;
 
 namespace Medical_Information_System_API.Controllers
 {
@@ -27,7 +27,7 @@ namespace Medical_Information_System_API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Post([FromBody] DoctorRegisterModel doctorDTO)
+        public async Task<IActionResult> PostRegister([FromBody] DoctorRegisterModel doctorDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -53,6 +53,38 @@ namespace Medical_Information_System_API.Controllers
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new (AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return Ok(new TokenResponseModel(tokenHandler.WriteToken(token)));
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> PostLogin([FromBody] LoginCredentialsModel loginData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var foundUser = await _context.Doctors.FindAsync(loginData.Email);
+
+            if (foundUser == null || !Crypto.VerifyHashedPassword(foundUser.Password, loginData.Password))
+            {
+                return BadRequest();
+            }
+
+            foundUser.Password = "";
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, foundUser.Name),
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
