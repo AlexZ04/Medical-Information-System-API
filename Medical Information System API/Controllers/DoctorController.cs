@@ -78,6 +78,9 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> PostLogout()
         {
+            // Redis 
+            // или пихать токены в бд, каждые 30 минут проверять разницу между текущим временем и временем добавления токена в базу
+            // если время больше 30 минут, удалять токен
             return Ok();
         }
 
