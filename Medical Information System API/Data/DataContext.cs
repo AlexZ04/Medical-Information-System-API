@@ -15,7 +15,7 @@ namespace Medical_Information_System_API.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<DoctorDatabase>().HasKey(x => x.Email);
+            builder.Entity<DoctorDatabase>().HasKey(x => x.Id);
 
             builder.Entity<DoctorDatabase>().ToTable("doctor");
 

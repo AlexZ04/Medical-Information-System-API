@@ -8,13 +8,13 @@ namespace Medical_Information_System_API.Classes
     {
         private JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-        public string CreateTokenByName(string name)
+        public string CreateTokenByName(Guid id)
         {
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, name),
+                    new Claim(ClaimTypes.NameIdentifier, id.ToString()),
                 }),
                 Issuer = AuthOptions.ISSUER,
                 Audience = AuthOptions.AUDIENCE,

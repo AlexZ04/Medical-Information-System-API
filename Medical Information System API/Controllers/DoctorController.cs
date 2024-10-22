@@ -47,7 +47,7 @@ namespace Medical_Information_System_API.Controllers
             _context.Doctors.Add(newDoctor);
             await _context.SaveChangesAsync();
 
-            var token = _tokenManager.CreateTokenByName(doctorDTO.Email);
+            var token = _tokenManager.CreateTokenByName(doctor.Id);
 
             return Ok(new TokenResponseModel(token));
         }
@@ -69,20 +69,29 @@ namespace Medical_Information_System_API.Controllers
 
             foundUser.Password = "";
 
-            var token = _tokenManager.CreateTokenByName(foundUser.Email);
+            var token = _tokenManager.CreateTokenByName(foundUser.Id);
 
             return Ok(new TokenResponseModel(token));
         }
 
-        [HttpGet("profile")]
+        [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> PostLogout()
         {
-            var userEmail = User.FindFirst(ClaimTypes.Name)?.Value;
+            return Ok();
+        }
 
-            _logger.LogInformation(userEmail);
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var loginnedDoctor = await _context.Doctors.FindAsync(userEmail);
+            if (userId == null) {
+                return Unauthorized();
+            }
+
+            var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
             if (loginnedDoctor == null)
             {
@@ -92,8 +101,14 @@ namespace Medical_Information_System_API.Controllers
             loginnedDoctor.Password = "";
             var doctor = new DoctorModel(loginnedDoctor);
 
-
             return Ok(doctor);
+        }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            return Ok();
         }
     }
 }
