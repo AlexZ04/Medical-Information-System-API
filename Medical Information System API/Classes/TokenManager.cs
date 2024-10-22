@@ -16,6 +16,8 @@ namespace Medical_Information_System_API.Classes
                 {
                     new Claim(ClaimTypes.Name, name),
                 }),
+                Issuer = AuthOptions.ISSUER,
+                Audience = AuthOptions.AUDIENCE,
                 Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256Signature)
             };

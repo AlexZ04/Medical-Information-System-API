@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Classes;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Models
@@ -18,5 +19,16 @@ namespace Medical_Information_System_API.Models
         [AllowNull]
         [Phone]
         public string Phone { get; set; }
+
+        public DoctorModel(DoctorDatabase model)
+        {
+            Id = model.Id;
+            CreateTime = model.CreateTime;
+            Name = model.Name;
+            Birthday = model.Birthday;
+            Gender = model.Gender;
+            Email = model.Email;
+            Phone = model.Phone;
+        }
     }
 }

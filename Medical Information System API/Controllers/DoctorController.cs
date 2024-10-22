@@ -1,6 +1,7 @@
 ﻿using Medical_Information_System_API.Classes;
 using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace Medical_Information_System_API.Controllers
             _context.Doctors.Add(newDoctor);
             await _context.SaveChangesAsync();
 
-            var token = _tokenManager.CreateTokenByName(doctorDTO.Name);
+            var token = _tokenManager.CreateTokenByName(doctorDTO.Email);
 
             return Ok(new TokenResponseModel(token));
         }
@@ -68,9 +69,31 @@ namespace Medical_Information_System_API.Controllers
 
             foundUser.Password = "";
 
-            var token = _tokenManager.CreateTokenByName(foundUser.Name);
+            var token = _tokenManager.CreateTokenByName(foundUser.Email);
 
             return Ok(new TokenResponseModel(token));
+        }
+
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> PostLogout()
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            _logger.LogInformation(userEmail);
+
+            var loginnedDoctor = await _context.Doctors.FindAsync(userEmail);
+
+            if (loginnedDoctor == null)
+            {
+                return Unauthorized();
+            }
+
+            loginnedDoctor.Password = "";
+            var doctor = new DoctorModel(loginnedDoctor);
+
+
+            return Ok(doctor);
         }
     }
 }
