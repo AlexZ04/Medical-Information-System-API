@@ -19,6 +19,7 @@ namespace Medical_Information_System_API.Controllers
         //protected ApiResponse _response;
         private readonly DataContext _context;
         private JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+        private TokenManager _tokenManager = new TokenManager();
 
         public DoctorController(ILogger<DoctorController> logger, DataContext context)
         {
@@ -45,19 +46,9 @@ namespace Medical_Information_System_API.Controllers
             _context.Doctors.Add(newDoctor);
             await _context.SaveChangesAsync();
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, doctorDTO.Name),
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new (AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256Signature)
-            };
+            var token = _tokenManager.CreateTokenByName(doctorDTO.Name);
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Ok(new TokenResponseModel(tokenHandler.WriteToken(token)));
+            return Ok(new TokenResponseModel(token));
         }
 
         [HttpPost("login")]
@@ -77,19 +68,9 @@ namespace Medical_Information_System_API.Controllers
 
             foundUser.Password = "";
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, foundUser.Name),
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256Signature)
-            };
+            var token = _tokenManager.CreateTokenByName(foundUser.Name);
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Ok(new TokenResponseModel(tokenHandler.WriteToken(token)));
+            return Ok(new TokenResponseModel(token));
         }
     }
 }
