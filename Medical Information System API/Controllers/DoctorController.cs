@@ -17,7 +17,6 @@ namespace Medical_Information_System_API.Controllers
     public class DoctorController : ControllerBase
     {
         private readonly ILogger<DoctorController> _logger;
-        //protected ApiResponse _response;
         private readonly DataContext _context;
         private JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
         private TokenManager _tokenManager = new TokenManager();
@@ -60,10 +59,9 @@ namespace Medical_Information_System_API.Controllers
                 return BadRequest();
             }
 
-            var foundUser = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == loginData.Email &&
-                Crypto.VerifyHashedPassword(u.Password, loginData.Password));
+            var foundUser = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == loginData.Email);
 
-            if (foundUser == null)
+            if (foundUser == null || !Crypto.VerifyHashedPassword(foundUser.Password, loginData.Password))
             {
                 return BadRequest();
             }
