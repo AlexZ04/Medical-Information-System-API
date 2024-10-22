@@ -3,6 +3,7 @@ using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Validations;
 using System.IdentityModel.Tokens.Jwt;
@@ -59,9 +60,10 @@ namespace Medical_Information_System_API.Controllers
                 return BadRequest();
             }
 
-            var foundUser = await _context.Doctors.FindAsync(loginData.Email);
+            var foundUser = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == loginData.Email &&
+                Crypto.VerifyHashedPassword(u.Password, loginData.Password));
 
-            if (foundUser == null || !Crypto.VerifyHashedPassword(foundUser.Password, loginData.Password))
+            if (foundUser == null)
             {
                 return BadRequest();
             }
