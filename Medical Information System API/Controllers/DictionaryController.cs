@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Medical_Information_System_API.Controllers
 {
     [ApiController]
-    [Route("api/consultation")]
+    [Route("api/dictionary")]
     public class DictionaryController : Controller
     {
         private readonly DataContext _context;
@@ -22,6 +22,18 @@ namespace Medical_Information_System_API.Controllers
             var consultationList = await _context.SpecialitiesList.ToListAsync();
 
             return Ok(consultationList);
+        }
+
+        [HttpGet("icd10")]
+        public async Task<IActionResult> GetDiagnoses()
+        {
+            return Ok();
+        }
+
+        [HttpGet("icd-10/roots")]
+        public async Task<IActionResult> GetRootICDElements()
+        {
+            return Ok();
         }
     }
 }
