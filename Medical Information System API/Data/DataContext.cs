@@ -13,6 +13,7 @@ namespace Medical_Information_System_API.Data
 
         public DbSet<DoctorDatabase> Doctors { get; set; }
         public DbSet<SpecialityModel> SpecialitiesList { get; set; }
+        public DbSet<PatientModel> Patients { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -24,6 +25,9 @@ namespace Medical_Information_System_API.Data
                 CreateSpecialitiesList()
             );
             builder.Entity<SpecialityModel>().ToTable("speciality");
+
+            builder.Entity<PatientModel>().HasKey(x => x.Id);
+            builder.Entity<PatientModel>().ToTable("patient");
 
             base.OnModelCreating(builder);
         }
