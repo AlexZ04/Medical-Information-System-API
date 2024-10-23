@@ -36,7 +36,7 @@ namespace Medical_Information_System_API.Controllers
                 return BadRequest();
             }
 
-            var doctor = await _context.Doctors.FindAsync(doctorDTO.Email);
+            var doctor = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == doctorDTO.Email);
 
             if (doctor != null)
             {
@@ -47,7 +47,7 @@ namespace Medical_Information_System_API.Controllers
             _context.Doctors.Add(newDoctor);
             await _context.SaveChangesAsync();
 
-            var token = _tokenManager.CreateTokenByName(doctor.Id);
+            var token = _tokenManager.CreateTokenByName(newDoctor.Id);
 
             return Ok(new TokenResponseModel(token));
         }
