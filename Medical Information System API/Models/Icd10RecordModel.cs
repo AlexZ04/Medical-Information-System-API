@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Models
@@ -9,7 +10,9 @@ namespace Medical_Information_System_API.Models
         public string Code { get; set; }
         [AllowNull]
         public string Name { get; set; }
+        [Required]
         public Guid Id { get; set; }
+        [Required]
         public DateTime CreateTime { get; set; }
 
         public Icd10RecordModel()

@@ -4,9 +4,12 @@ namespace Medical_Information_System_API.Models
 {
     public class SpecialityModel
     {
+        [Required]
         [MinLength(1, ErrorMessage = "Name field should have at least 1 symbol.")]
         public string Name { get; set; }
+        [Required]
         public Guid Id { get; set; }
+        [Required]
         public DateTime CreateTime { get; set; }
 
         public SpecialityModel(string name)
