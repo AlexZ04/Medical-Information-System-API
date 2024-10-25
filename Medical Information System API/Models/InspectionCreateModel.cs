@@ -19,7 +19,9 @@ namespace Medical_Information_System_API.Models
         public DateTime DeathDate { get; set; }
         [AllowNull]
         public Guid PreviousInspectionId {  get; set; }
-        
-        // диагноз и консультация
+        [Required]
+        public List<DiagnosisCreateModel> Diagnoses { get; set; }
+        [AllowNull]
+        public List<ConsultationCreateModel> Consultations { get; set; }
     }
 }
