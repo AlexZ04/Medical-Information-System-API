@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Models
@@ -25,6 +26,7 @@ namespace Medical_Information_System_API.Models
         [AllowNull]
         public Guid PreviousInspectionId {  get; set; }
         [Required]
+        [MinItems(1, ErrorMessage = "Array must contain at least 1 element.")]
         public List<DiagnosisCreateModel> Diagnoses { get; set; }
         [AllowNull]
         public List<ConsultationCreateModel> Consultations { get; set; }
