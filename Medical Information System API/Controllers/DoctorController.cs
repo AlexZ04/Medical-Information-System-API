@@ -43,6 +43,10 @@ namespace Medical_Information_System_API.Controllers
                 return BadRequest("This email is already used");
             }
 
+            var foundSpec = await _context.SpecialitiesList.FirstOrDefaultAsync(u => u.Id == doctorDTO.Speciality);
+
+            if (foundSpec == null) return BadRequest();
+
             var newDoctor = new DoctorDatabase(doctorDTO);
             _context.Doctors.Add(newDoctor);
             await _context.SaveChangesAsync();
