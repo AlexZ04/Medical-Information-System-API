@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Validations;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Web.Helpers;
@@ -90,8 +91,9 @@ namespace Medical_Information_System_API.Controllers
         public async Task<IActionResult> GetProfile()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var token = HttpContext.GetTokenAsync("access_token").Result;
 
-            if (userId == null) return Unauthorized();
+            if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
@@ -108,8 +110,9 @@ namespace Medical_Information_System_API.Controllers
         public async Task<IActionResult> EditProfile([FromBody] DoctorEditModel newDoctor)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var token = HttpContext.GetTokenAsync("access_token").Result;
 
-            if (userId == null) return Unauthorized();
+            if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
