@@ -15,7 +15,7 @@ namespace Medical_Information_System_API.Data
         public DbSet<DoctorDatabase> Doctors { get; set; }
         public DbSet<SpecialityModel> SpecialitiesList { get; set; }
         public DbSet<PatientModel> Patients { get; set; }
-        //public DbSet<Icd10RecordModel> Icd10Roots { get; set; }
+        //public DbSet<Icd10Record> Icd10 { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,8 +34,12 @@ namespace Medical_Information_System_API.Data
             builder.Entity<BlacklistToken>().HasKey(x => x.Token);
             builder.Entity<BlacklistToken>().ToTable("tokenBlacklist");
 
-            //builder.Entity<Icd10RecordModel>().HasKey(x => x.Id);
-            //builder.Entity<Icd10RecordModel>().ToTable("icd10root");
+            //builder.Entity<Icd10Record>().HasKey(x => x.Code);
+            //builder.Entity<Icd10Record>().ToTable("icd10");
+
+            //builder.Entity<SpecialityModel>().HasData(
+            //    new Icd10Manager().GetListIcd10()
+            //);
 
             base.OnModelCreating(builder);
         }

@@ -1,4 +1,5 @@
-﻿using Medical_Information_System_API.Data;
+﻿using Medical_Information_System_API.Classes;
+using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,12 @@ namespace Medical_Information_System_API.Controllers
     [Route("api/dictionary")]
     public class DictionaryController : Controller
     {
+        private readonly ILogger<DictionaryController> _logger;
         private readonly DataContext _context;
 
-        public DictionaryController(DataContext context)
+        public DictionaryController(ILogger<DictionaryController> logger, DataContext context)
         {
+            _logger = logger;
             _context = context;
         }
 
@@ -40,6 +43,10 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {
+            List<Icd10JsonModel> test = new Icd10Manager().Test();
+
+            _logger.LogInformation(test[0].Mkb_Name.ToString());
+
             return Ok();
         }
     }
