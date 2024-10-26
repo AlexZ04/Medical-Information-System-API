@@ -11,6 +11,7 @@ namespace Medical_Information_System_API.Data
         { 
         }
 
+        public DbSet<BlacklistToken> BlacklistTokens { get; set; }
         public DbSet<DoctorDatabase> Doctors { get; set; }
         public DbSet<SpecialityModel> SpecialitiesList { get; set; }
         public DbSet<PatientModel> Patients { get; set; }
@@ -29,6 +30,9 @@ namespace Medical_Information_System_API.Data
 
             builder.Entity<PatientModel>().HasKey(x => x.Id);
             builder.Entity<PatientModel>().ToTable("patient");
+
+            builder.Entity<BlacklistToken>().HasKey(x => x.Token);
+            builder.Entity<BlacklistToken>().ToTable("tokenBlacklist");
 
             //builder.Entity<Icd10RecordModel>().HasKey(x => x.Id);
             //builder.Entity<Icd10RecordModel>().ToTable("icd10root");
@@ -60,6 +64,12 @@ namespace Medical_Information_System_API.Data
             };
 
             return list;
+        }
+
+        public bool CheckToken(string token)
+        {
+
+            return BlacklistTokens.Find(token) == null ? true : false;
         }
 
     }

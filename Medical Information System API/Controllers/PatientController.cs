@@ -42,6 +42,13 @@ namespace Medical_Information_System_API.Controllers
             return Ok(patientList);
         }
 
+        [HttpPost("{id}/inspections")]
+        [Authorize]
+        public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspect)
+        {
+            return Ok();
+        }
+
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetPatientCard(Guid id)
@@ -51,11 +58,5 @@ namespace Medical_Information_System_API.Controllers
             return patient != null ? Ok(patient) : NotFound();
         }
 
-        [HttpPost("{id}/inspections")]
-        [Authorize]
-        public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspect)
-        {
-            return Ok();
-        }
     }
 }

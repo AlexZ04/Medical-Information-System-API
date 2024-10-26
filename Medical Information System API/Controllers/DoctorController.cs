@@ -1,6 +1,7 @@
 ﻿using Medical_Information_System_API.Classes;
 using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -20,7 +21,7 @@ namespace Medical_Information_System_API.Controllers
         private readonly ILogger<DoctorController> _logger;
         private readonly DataContext _context;
         private JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        private TokenManager _tokenManager = new TokenManager();
+        private readonly TokenManager _tokenManager = new TokenManager();
 
         public DoctorController(ILogger<DoctorController> logger, DataContext context)
         {
@@ -31,17 +32,11 @@ namespace Medical_Information_System_API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> PostRegister([FromBody] DoctorRegisterModel doctorDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
 
             var doctor = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == doctorDTO.Email);
 
-            if (doctor != null)
-            {
-                return BadRequest("This email is already used");
-            }
+            if (doctor != null) return BadRequest("This email is already used");
 
             var foundSpec = await _context.SpecialitiesList.FirstOrDefaultAsync(u => u.Id == doctorDTO.Speciality);
 
@@ -59,10 +54,7 @@ namespace Medical_Information_System_API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> PostLogin([FromBody] LoginCredentialsModel loginData)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
 
             var foundUser = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == loginData.Email);
 
@@ -82,9 +74,14 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> PostLogout()
         {
-            // Redis 
-            // или пихать токены в бд, каждые 30 минут проверять разницу между текущим временем и временем добавления токена в базу
-            // если время больше 30 минут, удалять токен
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            var tokenInBlacklist = new BlacklistToken(token);
+            _context.BlacklistTokens.Add(tokenInBlacklist);
+            await _context.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -94,16 +91,11 @@ namespace Medical_Information_System_API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null) {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
-            if (loginnedDoctor == null)
-            {
-                return Unauthorized();
-            }
+            if (loginnedDoctor == null) return Unauthorized();
 
             loginnedDoctor.Password = "";
             var doctor = new DoctorModel(loginnedDoctor);
@@ -117,17 +109,11 @@ namespace Medical_Information_System_API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
-            if (loginnedDoctor == null)
-            {
-                return Unauthorized();
-            }
+            if (loginnedDoctor == null) return Unauthorized();
 
             loginnedDoctor.Email = newDoctor.Email;
             loginnedDoctor.Name = newDoctor.Name;
