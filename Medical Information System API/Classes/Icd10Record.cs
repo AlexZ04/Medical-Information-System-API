@@ -10,16 +10,25 @@ namespace Medical_Information_System_API.Classes
         public string Name { get; set; }
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; }
-        public bool IsParent { get; set; }
+        [AllowNull]
+        public Guid ParentId { get; set; }
 
-        public Icd10Record(Icd10RecordModel model, bool isParent)
+        public Icd10Record(Icd10RecordModel model, Guid parentId)
         {
             Code = model.Code;
             Name = model.Name;
             Id = model.Id;
             CreateTime = model.CreateTime;
 
-            IsParent = isParent;
+            ParentId = parentId;
+        }
+
+        public Icd10Record(Icd10RecordModel model)
+        {
+            Code = model.Code;
+            Name = model.Name;
+            Id = model.Id;
+            CreateTime = model.CreateTime;
         }
     }
 }

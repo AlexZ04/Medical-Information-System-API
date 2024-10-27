@@ -43,11 +43,7 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {
-            List<Icd10JsonModel> test = new Icd10Manager().Test();
-
-            _logger.LogInformation(test[0].Mkb_Name.ToString());
-
-            return Ok();
+            return Ok(new Icd10Manager().GetListIcd10());
         }
     }
 }

@@ -9,5 +9,10 @@
         public string Id_Parent { get; set; }
         public string Actual { get; set; }
         public string Date { get; set; }
+
+        public Icd10JsonModel()
+        {
+            Id_Parent = null;
+        }
     }
 }
