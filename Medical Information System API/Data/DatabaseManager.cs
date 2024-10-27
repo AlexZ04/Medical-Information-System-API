@@ -1,4 +1,6 @@
-﻿using Npgsql;
+﻿using Medical_Information_System_API.Classes;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Medical_Information_System_API.Data;
 

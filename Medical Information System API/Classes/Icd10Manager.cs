@@ -17,6 +17,7 @@ namespace Medical_Information_System_API.Classes
             var json = reader.ReadToEnd();
 
             List<Icd10JsonModel> jsonRecords = GetJsonList();
+            jsonRecords.Add(new Icd10JsonModel { Id_Parent = null, Mkb_Code = "XXXXX" });
 
             List<Icd10Record> roots = new List<Icd10Record>();
 
@@ -31,7 +32,7 @@ namespace Medical_Information_System_API.Classes
                         lastCode = records[^1].Code.Split(".")[0];
                         roots[^1].Code = firstCode + "-" + lastCode;
 
-                        if (record.Mkb_Code == "XXII") break;
+                        if (record.Mkb_Code == "XXXXX") break;
                     }
 
                     roots.Add(new Icd10Record(new Icd10RecordModel(record.Mkb_Code, record.Mkb_Name)));
