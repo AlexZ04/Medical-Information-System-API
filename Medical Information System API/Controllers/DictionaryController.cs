@@ -47,7 +47,7 @@ namespace Medical_Information_System_API.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            var records = await _context.Icd10.OrderBy(d => d.Code).Where(d => d.Name.ToLower().Contains(request.ToLower()) ||
+            var records = await _context.Icd10.OrderBy(d => d.Code).Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
                 d.Code.ToLower().Contains(request.ToLower()))
                 .Skip((page - 1) * size).Take(size).ToListAsync();
 
@@ -57,7 +57,7 @@ namespace Medical_Information_System_API.Controllers
                 diagnosesList.Add(new Icd10RecordModel { Code = record.Code, Id = record.Id, CreateTime = record.CreateTime, Name = record.Name });
             }
 
-            var amountOfDiagnoses = await _context.Icd10.Where(d => d.Name.ToLower().Contains(request.ToLower()) ||
+            var amountOfDiagnoses = await _context.Icd10.Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
                 d.Code.ToLower().Contains(request.ToLower())).CountAsync();
             var count = (int)Math.Ceiling(amountOfDiagnoses * 1.0 / size);
 
