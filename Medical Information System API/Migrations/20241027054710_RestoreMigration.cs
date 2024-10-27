@@ -73,6 +73,21 @@ namespace Medical_Information_System_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "icd10",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Code = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_icd10", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "patient",
                 columns: table => new
                 {
@@ -223,24 +238,24 @@ namespace Medical_Information_System_API.Migrations
                 columns: new[] { "Id", "CreateTime", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("028dabe8-a18a-498b-a42d-c8b138626061"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1977), "Офтальмолог" },
-                    { new Guid("0f0a9716-b504-4309-8d7c-e56f1f9a17cf"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1958), "Кардиолог" },
-                    { new Guid("1a6c20e8-197b-4b02-ac30-6ef234d210bf"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1953), "Анестезиолог-реаниматолог" },
-                    { new Guid("2064937c-a9ad-40db-b4ed-144dd37179d1"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1976), "Отоларинголог" },
-                    { new Guid("2a31ebd2-13bc-41d1-ab14-35903e88bb52"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1955), "Дерматовенеролог" },
-                    { new Guid("2e30f292-0501-44b0-b7ef-d83d2fa9f558"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1981), "Психолог" },
-                    { new Guid("4b7c0bda-442a-4c63-8103-2bc877c6620f"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1992), "Хирург" },
-                    { new Guid("4c4eccee-8d83-46bf-ac4b-1e1634f50d05"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1956), "Инфекционист" },
-                    { new Guid("66c89551-1152-4d65-846b-94d9d0e3842b"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1990), "Уролог" },
-                    { new Guid("6a3bb26b-8252-4a36-bd8b-56479917fbcf"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1984), "Стоматолог" },
-                    { new Guid("6d4e91da-68be-4eb1-a899-371f0fb367df"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1974), "Онколог" },
-                    { new Guid("75fbfb64-0b80-433b-9ec0-94b9c0c38646"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1985), "Терапевт" },
-                    { new Guid("7971de8f-f342-4fd1-8a98-4b7718223bfd"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1979), "Психиатр" },
-                    { new Guid("7f30a93c-b63f-4a8c-8d5d-f08c7aa5c61d"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1983), "Рентгенолог" },
-                    { new Guid("bf451687-00f5-48a7-9fca-6875d91a35b6"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1989), "УЗИ-специалист" },
-                    { new Guid("c1ca9963-c0ce-47b9-8e54-0763a67fb052"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1994), "Эндокринолог" },
-                    { new Guid("cc56202f-97a2-4187-a8f0-15e72902c724"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1961), "Невролог" },
-                    { new Guid("fe784982-782e-4f93-a7cb-96db1ef7cd1b"), new DateTime(2024, 10, 27, 5, 5, 31, 266, DateTimeKind.Utc).AddTicks(1912), "Акушер-гинеколог" }
+                    { new Guid("004a642f-5886-4091-9332-37b1562886c7"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7634), "Дерматовенеролог" },
+                    { new Guid("08d34521-bc76-4733-acf7-4779fc6c6886"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7631), "Анестезиолог-реаниматолог" },
+                    { new Guid("0bf67a48-69db-4be8-8148-f1439506ab5c"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7657), "Психиатр" },
+                    { new Guid("15cf3ab8-ea35-4425-9f1d-f9342ede1d01"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7646), "Инфекционист" },
+                    { new Guid("1669137b-1b0f-4037-9eda-a62ffd7bd3e7"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7667), "УЗИ-специалист" },
+                    { new Guid("1d0d7975-142b-4f29-8ddb-fa0cdb7413c5"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7654), "Отоларинголог" },
+                    { new Guid("3851c555-24a3-437a-88dd-c861cea26463"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7662), "Рентгенолог" },
+                    { new Guid("418154c2-e78f-4e33-a44a-f756914880cf"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7595), "Акушер-гинеколог" },
+                    { new Guid("427afc69-ee75-48ec-b71f-c42b3eb439ec"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7659), "Психолог" },
+                    { new Guid("69439086-0489-483d-84cb-5de2968e38b7"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7664), "Стоматолог" },
+                    { new Guid("70d99873-6637-4ed4-9cd5-cf860503495d"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7670), "Хирург" },
+                    { new Guid("7c03fe4b-5a60-40fd-9e37-94be21924a26"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7655), "Офтальмолог" },
+                    { new Guid("959d8772-224f-4e71-88a5-e430f7e16aab"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7652), "Онколог" },
+                    { new Guid("a4051901-5195-474a-8f07-f80b97ed06f6"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7668), "Уролог" },
+                    { new Guid("cdd4d4ae-0e3d-429e-993b-466b1102f433"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7672), "Эндокринолог" },
+                    { new Guid("d3fd25a5-c465-44ed-9447-8820bf142e56"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7651), "Невролог" },
+                    { new Guid("d4389d75-c62f-49d2-8595-f5de53120b96"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7665), "Терапевт" },
+                    { new Guid("ea82d514-a1d5-4f89-97eb-04b5eeacb557"), new DateTime(2024, 10, 27, 5, 47, 10, 296, DateTimeKind.Utc).AddTicks(7648), "Кардиолог" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -301,6 +316,9 @@ namespace Medical_Information_System_API.Migrations
 
             migrationBuilder.DropTable(
                 name: "doctor");
+
+            migrationBuilder.DropTable(
+                name: "icd10");
 
             migrationBuilder.DropTable(
                 name: "patient");

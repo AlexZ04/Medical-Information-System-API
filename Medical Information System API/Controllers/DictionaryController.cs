@@ -43,15 +43,15 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {
-            //var roots = await _context.Icd10.Where(x => x.Id == Guid.Empty).ToListAsync();
+            var roots = await _context.Icd10.Where(x => x.Id == Guid.Empty).ToListAsync();
 
-            //var res = new List<Icd10RecordModel>();
-            //foreach (var root in roots)
-            //{
-            //    res.Add(new Icd10RecordModel(root));
-            //}
+            var res = new List<Icd10RecordModel>();
+            foreach (var root in roots)
+            {
+                res.Add(new Icd10RecordModel {Code = root.Code, Id = root.Id, CreateTime = root.CreateTime, Name = root.Name });
+            }
 
-            //return Ok(res);
+            return Ok(res);
 
             return Ok();
         }

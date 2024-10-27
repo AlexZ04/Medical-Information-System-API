@@ -29,13 +29,5 @@ namespace Medical_Information_System_API.Models
             Id = Guid.NewGuid();
             CreateTime = DateTime.Now.ToUniversalTime();
         }
-
-        public Icd10RecordModel(Icd10Record recordFromData)
-        {
-            Code = recordFromData.Code;
-            Name = recordFromData.Name;
-            Id = recordFromData.Id;
-            CreateTime = recordFromData.CreateTime;
-        }
     }
 }
