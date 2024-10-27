@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+﻿using Medical_Information_System_API.Classes;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
@@ -27,6 +28,14 @@ namespace Medical_Information_System_API.Models
             Name = name;
             Id = Guid.NewGuid();
             CreateTime = DateTime.Now.ToUniversalTime();
+        }
+
+        public Icd10RecordModel(Icd10Record recordFromData)
+        {
+            Code = recordFromData.Code;
+            Name = recordFromData.Name;
+            Id = recordFromData.Id;
+            CreateTime = recordFromData.CreateTime;
         }
     }
 }

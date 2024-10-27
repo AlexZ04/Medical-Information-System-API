@@ -13,11 +13,13 @@ namespace Medical_Information_System_API.Controllers
     {
         private readonly ILogger<DictionaryController> _logger;
         private readonly DataContext _context;
+        private Icd10Manager icd10Manager = new Icd10Manager();
 
         public DictionaryController(ILogger<DictionaryController> logger, DataContext context)
         {
             _logger = logger;
             _context = context;
+            icd10Manager.GetListIcd10();
         }
 
         [HttpGet("speciality")]
@@ -41,9 +43,17 @@ namespace Medical_Information_System_API.Controllers
         }
 
         [HttpGet("icd-10/roots")]
-        public async Task<IActionResult> GetRootICDElements()
+        public IActionResult GetRootICDElements()
         {
-            return Ok(new Icd10Manager().GetListIcd10());
+            var roots = icd10Manager.GetRoots();
+
+            var res = new List<Icd10RecordModel>();
+            foreach (var root in roots)
+            {
+                res.Add(new Icd10RecordModel(root));
+            }
+
+            return Ok(res);
         }
     }
 }

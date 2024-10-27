@@ -56,7 +56,7 @@ namespace Medical_Information_System_API.Classes
                 
             }
 
-            return roots;
+            //return roots;
             return records;
         }
 
@@ -68,6 +68,11 @@ namespace Medical_Information_System_API.Classes
             List<Icd10JsonModel> jsonRecords = JsonConvert.DeserializeObject<List<Icd10JsonModel>>(json).OrderBy(x => x.Rec_Code).ToList();
 
             return jsonRecords;
+        }
+
+        public List<Icd10Record> GetRoots()
+        {
+            return records.Where(x => x.ParentId == Guid.Empty).ToList();
         }
     }
 }

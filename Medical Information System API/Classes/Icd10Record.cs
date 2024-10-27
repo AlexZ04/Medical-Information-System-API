@@ -30,5 +30,11 @@ namespace Medical_Information_System_API.Classes
             Id = model.Id;
             CreateTime = model.CreateTime;
         }
+
+        public Icd10Record()
+        {
+            CreateTime = DateTime.Now.ToUniversalTime();
+            Id = Guid.NewGuid();
+        }
     }
 }
