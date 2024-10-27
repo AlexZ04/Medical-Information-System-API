@@ -69,10 +69,5 @@ namespace Medical_Information_System_API.Classes
 
             return jsonRecords;
         }
-
-        public List<Icd10Record> GetRoots()
-        {
-            return records.Where(x => x.ParentId == Guid.Empty).ToList();
-        }
     }
 }
