@@ -18,8 +18,8 @@ namespace Medical_Information_System_API.Classes
         public DateTime DeathDate { get; set; }
         public Guid BaseInspectionId { get; set; }
         public Guid PreviousInspectionId { get; set; }
-        public Guid PatientId { get; set; }
-        public Guid DoctorId { get; set; }
+        public PatientModel Patient { get; set; }
+        public DoctorModel Doctor { get; set; }
         public List<DiagnosisModel> Diagnoses { get; set; }
         public List<Consultation> Consultations { get; set; }
 

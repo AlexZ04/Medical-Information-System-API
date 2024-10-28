@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Classes
@@ -10,8 +11,10 @@ namespace Medical_Information_System_API.Classes
         [AllowNull]
         public DateTime ModifiedDate { get; set; }
         public string Content { get; set; }
-        public Guid AuthorId { get; set; }
+        public DoctorModel Author { get; set; }
         [AllowNull]
         public Guid ParentId { get; set; }
+
+        public Comment() { }
     }
 }
