@@ -12,10 +12,17 @@ namespace Medical_Information_System_API.Data
         }
 
         public DbSet<BlacklistToken> BlacklistTokens { get; set; }
+
         public DbSet<DoctorDatabase> Doctors { get; set; }
-        public DbSet<SpecialityModel> SpecialitiesList { get; set; }
         public DbSet<PatientModel> Patients { get; set; }
+
+        public DbSet<SpecialityModel> SpecialitiesList { get; set; }
         public DbSet<Icd10Record> Icd10 { get; set; }
+
+        public DbSet<Inspection> Inspections { get; set; }
+        public DbSet<DiagnosisModel> Diagnoses { get; set; }
+        public DbSet<Consultation> Consultations { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -37,9 +44,15 @@ namespace Medical_Information_System_API.Data
             builder.Entity<Icd10Record>().HasKey(x => x.Id);
             builder.Entity<Icd10Record>().ToTable("icd10");
 
-            //builder.Entity<Icd10Record>().HasData(
-            //    new Icd10Manager().GetListIcd10()
-            //);
+            builder.Entity<Inspection>().HasKey(x => x.Id);
+            builder.Entity<DiagnosisModel>().HasKey(x => x.Id);
+            builder.Entity<Consultation>().HasKey(x => x.Id);
+            builder.Entity<Comment>().HasKey(x => x.Id);
+
+            builder.Entity<Inspection>().ToTable("inspection");
+            builder.Entity<DiagnosisModel>().ToTable("diagnose");
+            builder.Entity<Consultation>().ToTable("consultation");
+            builder.Entity<Comment>().ToTable("comment");
 
             base.OnModelCreating(builder);
         }
