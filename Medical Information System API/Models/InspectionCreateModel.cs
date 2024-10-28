@@ -27,6 +27,7 @@ namespace Medical_Information_System_API.Models
         public Guid PreviousInspectionId {  get; set; }
         [Required]
         [MinItems(1, ErrorMessage = "Array must contain at least 1 element.")]
+        [HasMainDiagnose(ErrorMessage = "Diagnoses must contain only 1 diagnose with Main type.")]
         public List<DiagnosisCreateModel> Diagnoses { get; set; }
         [AllowNull]
         public List<ConsultationCreateModel> Consultations { get; set; }
