@@ -4,17 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Classes
 {
-    public class Comment
+    public class Diagnose
     {
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; }
-        [AllowNull]
-        public DateTime ModifiedDate { get; set; }
-        public string Content { get; set; }
-        public DoctorDatabase Author { get; set; }
-        [AllowNull]
-        public Guid ParentId { get; set; }
-
-        public Comment() { }
+        public Icd10Record Record { get; set; }
+        public string Description { get; set; }
+        public DiagnosisType Type { get; set; }
     }
 }

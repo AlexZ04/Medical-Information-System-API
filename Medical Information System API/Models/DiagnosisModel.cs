@@ -19,7 +19,5 @@ namespace Medical_Information_System_API.Models
         public string Description { get; set; }
         [Required]
         public DiagnosisType Type { get; set; }
-
-        public DiagnosisModel() { }
     }
 }

@@ -19,13 +19,13 @@ namespace Medical_Information_System_API.Classes
         public Guid BaseInspectionId { get; set; }
         public Guid PreviousInspectionId { get; set; }
         public PatientModel Patient { get; set; }
-        public DoctorModel Doctor { get; set; }
-        public List<DiagnosisModel> Diagnoses { get; set; }
+        public DoctorDatabase Doctor { get; set; }
+        public List<Diagnose> Diagnoses { get; set; }
         public List<Consultation> Consultations { get; set; }
 
         public Inspection()
         {
-            Diagnoses = new List<DiagnosisModel>();
+            Diagnoses = new List<Diagnose>();
             Consultations = new List<Consultation>();
         }
     }

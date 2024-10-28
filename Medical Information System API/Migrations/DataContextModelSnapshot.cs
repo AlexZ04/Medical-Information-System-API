@@ -93,6 +93,37 @@ namespace Medical_Information_System_API.Migrations
                     b.ToTable("consultation", (string)null);
                 });
 
+            modelBuilder.Entity("Medical_Information_System_API.Classes.Diagnose", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("InspectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RecordId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InspectionId");
+
+                    b.HasIndex("RecordId");
+
+                    b.ToTable("diagnose", (string)null);
+                });
+
             modelBuilder.Entity("Medical_Information_System_API.Classes.DoctorDatabase", b =>
                 {
                     b.Property<Guid>("Id")
@@ -211,72 +242,6 @@ namespace Medical_Information_System_API.Migrations
                     b.ToTable("inspection", (string)null);
                 });
 
-            modelBuilder.Entity("Medical_Information_System_API.Models.DiagnosisModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("InspectionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InspectionId");
-
-                    b.ToTable("diagnose", (string)null);
-                });
-
-            modelBuilder.Entity("Medical_Information_System_API.Models.DoctorModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Birthday")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DoctorModel");
-                });
-
             modelBuilder.Entity("Medical_Information_System_API.Models.PatientModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -321,110 +286,110 @@ namespace Medical_Information_System_API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7700d6bc-9b50-4707-bbcb-62f168c9c78d"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7028),
+                            Id = new Guid("bc40d866-07f1-4f23-a65c-61f0bcd2caf0"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9083),
                             Name = "Акушер-гинеколог"
                         },
                         new
                         {
-                            Id = new Guid("722182aa-18a6-4592-a7b9-f11349c301f1"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7072),
+                            Id = new Guid("a763748f-1353-420a-870c-a67819cf3d8a"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9169),
                             Name = "Анестезиолог-реаниматолог"
                         },
                         new
                         {
-                            Id = new Guid("01fe0004-dab4-422c-99f4-31a8aa1ada95"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7074),
+                            Id = new Guid("3fd075cc-a641-4c54-8b11-267cfc0f5dc1"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9172),
                             Name = "Дерматовенеролог"
                         },
                         new
                         {
-                            Id = new Guid("ad76ec6b-3321-4913-9dc8-a9748908f63d"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7076),
+                            Id = new Guid("3aa791df-2654-4b89-a6d0-ddfa6aab2818"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9174),
                             Name = "Инфекционист"
                         },
                         new
                         {
-                            Id = new Guid("31ed31bf-e93e-48d8-9bff-759c75d2dc47"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7090),
+                            Id = new Guid("c92887a8-f8e0-4263-af48-ed0f32c60b8e"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9185),
                             Name = "Кардиолог"
                         },
                         new
                         {
-                            Id = new Guid("037400fe-f6e5-4cd3-a1bf-56d8f5bf3ac2"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7094),
+                            Id = new Guid("57f523dc-2b7e-4d43-af72-2da73c3bf6a3"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9235),
                             Name = "Невролог"
                         },
                         new
                         {
-                            Id = new Guid("1374ffcd-a93a-4e6c-ad96-b02cf942ad62"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7096),
+                            Id = new Guid("e2bdb674-85b3-4398-a5c3-a37dcc4b4578"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9237),
                             Name = "Онколог"
                         },
                         new
                         {
-                            Id = new Guid("28ec18e0-8032-4d3e-867a-d97fbe41a9ea"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7097),
+                            Id = new Guid("eb1f0a5c-b34c-42c7-942a-8b295878929f"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9239),
                             Name = "Отоларинголог"
                         },
                         new
                         {
-                            Id = new Guid("8457b68e-4eb5-475c-9d1d-167814542e95"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7099),
+                            Id = new Guid("4c0344fa-d522-46dd-862a-9b7ca483497f"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9240),
                             Name = "Офтальмолог"
                         },
                         new
                         {
-                            Id = new Guid("ea34808b-bb2c-4357-93b1-9dde99aee1e7"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7101),
+                            Id = new Guid("e7f588df-51ee-464c-9bbb-3c84f1e228f8"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9243),
                             Name = "Психиатр"
                         },
                         new
                         {
-                            Id = new Guid("393cf46c-6833-4a5f-8dcc-8458a6d84629"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7103),
+                            Id = new Guid("4d4d31a2-bea8-4b7d-9240-51392b9440e7"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9244),
                             Name = "Психолог"
                         },
                         new
                         {
-                            Id = new Guid("91c7cee7-3a25-4ce5-ad91-a2fb2d3584c9"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7104),
+                            Id = new Guid("ca6f65fb-41bf-41bd-8bb4-f181e703d69e"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9245),
                             Name = "Рентгенолог"
                         },
                         new
                         {
-                            Id = new Guid("51c9f493-1558-45c6-ad6a-7ebdd6502dc5"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7107),
+                            Id = new Guid("28b63826-920a-4ce1-a3d1-62b74cfbc5e0"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9249),
                             Name = "Стоматолог"
                         },
                         new
                         {
-                            Id = new Guid("6f312cca-7b03-4f20-9c81-80616d526478"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7110),
+                            Id = new Guid("92f59e15-280c-4e18-b5a4-99302acab646"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9250),
                             Name = "Терапевт"
                         },
                         new
                         {
-                            Id = new Guid("d5c9b6a4-c675-462e-ac83-545571e03c18"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7111),
+                            Id = new Guid("20be656d-1851-4ca3-9997-5427d1716de5"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9251),
                             Name = "УЗИ-специалист"
                         },
                         new
                         {
-                            Id = new Guid("1bff1b38-9709-4c8a-a22d-c8d1d8d10425"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7112),
+                            Id = new Guid("b9dcd3db-2246-46d6-8cf9-f11c62e40395"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9253),
                             Name = "Уролог"
                         },
                         new
                         {
-                            Id = new Guid("5809b609-0dbe-4684-96b7-2fc315ddf0f0"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7114),
+                            Id = new Guid("a3ed7aa5-fbac-44c5-9932-5a78f16e5591"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9254),
                             Name = "Хирург"
                         },
                         new
                         {
-                            Id = new Guid("042121f0-d31f-4c67-aeed-fae56a4f5aa5"),
-                            CreateTime = new DateTime(2024, 10, 28, 11, 4, 39, 818, DateTimeKind.Utc).AddTicks(7116),
+                            Id = new Guid("737e6efe-3ea9-4c03-8383-f8b7522bcbe3"),
+                            CreateTime = new DateTime(2024, 10, 28, 11, 52, 56, 515, DateTimeKind.Utc).AddTicks(9256),
                             Name = "Эндокринолог"
                         });
                 });
@@ -627,7 +592,7 @@ namespace Medical_Information_System_API.Migrations
 
             modelBuilder.Entity("Medical_Information_System_API.Classes.Comment", b =>
                 {
-                    b.HasOne("Medical_Information_System_API.Models.DoctorModel", "Author")
+                    b.HasOne("Medical_Information_System_API.Classes.DoctorDatabase", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -659,9 +624,24 @@ namespace Medical_Information_System_API.Migrations
                     b.Navigation("Speciality");
                 });
 
+            modelBuilder.Entity("Medical_Information_System_API.Classes.Diagnose", b =>
+                {
+                    b.HasOne("Medical_Information_System_API.Classes.Inspection", null)
+                        .WithMany("Diagnoses")
+                        .HasForeignKey("InspectionId");
+
+                    b.HasOne("Medical_Information_System_API.Classes.Icd10Record", "Record")
+                        .WithMany()
+                        .HasForeignKey("RecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Record");
+                });
+
             modelBuilder.Entity("Medical_Information_System_API.Classes.Inspection", b =>
                 {
-                    b.HasOne("Medical_Information_System_API.Models.DoctorModel", "Doctor")
+                    b.HasOne("Medical_Information_System_API.Classes.DoctorDatabase", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -676,13 +656,6 @@ namespace Medical_Information_System_API.Migrations
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("Medical_Information_System_API.Models.DiagnosisModel", b =>
-                {
-                    b.HasOne("Medical_Information_System_API.Classes.Inspection", null)
-                        .WithMany("Diagnoses")
-                        .HasForeignKey("InspectionId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

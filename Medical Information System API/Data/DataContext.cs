@@ -20,7 +20,7 @@ namespace Medical_Information_System_API.Data
         public DbSet<Icd10Record> Icd10 { get; set; }
 
         public DbSet<Inspection> Inspections { get; set; }
-        public DbSet<DiagnosisModel> Diagnoses { get; set; }
+        public DbSet<Diagnose> Diagnoses { get; set; }
         public DbSet<Consultation> Consultations { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
@@ -45,12 +45,12 @@ namespace Medical_Information_System_API.Data
             builder.Entity<Icd10Record>().ToTable("icd10");
 
             builder.Entity<Inspection>().HasKey(x => x.Id);
-            builder.Entity<DiagnosisModel>().HasKey(x => x.Id);
+            builder.Entity<Diagnose>().HasKey(x => x.Id);
             builder.Entity<Consultation>().HasKey(x => x.Id);
             builder.Entity<Comment>().HasKey(x => x.Id);
 
             builder.Entity<Inspection>().ToTable("inspection");
-            builder.Entity<DiagnosisModel>().ToTable("diagnose");
+            builder.Entity<Diagnose>().ToTable("diagnose");
             builder.Entity<Consultation>().ToTable("consultation");
             builder.Entity<Comment>().ToTable("comment");
 

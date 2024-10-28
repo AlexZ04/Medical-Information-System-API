@@ -35,7 +35,5 @@ namespace Medical_Information_System_API.Models
             Email = model.Email;
             Phone = model.Phone;
         }
-
-        public DoctorModel() { }
     }
 }
