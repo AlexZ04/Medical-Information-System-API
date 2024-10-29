@@ -80,5 +80,41 @@ namespace Medical_Information_System_API.Controllers
 
             return Ok();
         }
+
+        [HttpGet("{id}/chain")]
+        [Authorize]
+        public async Task<IActionResult> GetChain(Guid id)
+        {
+            var insp = await _context.Inspections
+                .Include(x => x.Patient).Include(x => x.Doctor)
+                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (insp == null) return BadRequest();
+
+            List<Inspection> chain = new List<Inspection>();
+            bool flag = true;
+            Guid currentId = insp.Id;
+
+            while (flag)
+            {
+                var nextInsp = await _context.Inspections
+                    .Include(x => x.Patient).Include(x => x.Doctor)
+                    .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                    .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                    .FirstOrDefaultAsync(x => x.Id == currentId);
+
+                if (nextInsp == null) flag = false;
+                else
+                {
+                    chain.Add(nextInsp);
+                    currentId = nextInsp.Id;
+                }
+                
+            }
+
+            return Ok(chain);
+        }
     }
 }

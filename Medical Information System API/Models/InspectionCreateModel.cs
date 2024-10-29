@@ -20,11 +20,11 @@ namespace Medical_Information_System_API.Models
         [Required]
         public Conclusion Conclusion { get; set; }
         [AllowNull]
-        public DateTime NextVisitDate { get; set; }
+        public DateTime? NextVisitDate { get; set; }
         [AllowNull]
-        public DateTime DeathDate { get; set; }
+        public DateTime? DeathDate { get; set; }
         [AllowNull]
-        public Guid PreviousInspectionId {  get; set; }
+        public Guid? PreviousInspectionId {  get; set; }
         [Required]
         [MinItems(1, ErrorMessage = "Array must contain at least 1 element.")]
         [HasMainDiagnose(ErrorMessage = "Diagnoses must contain only 1 diagnose with Main type.")]

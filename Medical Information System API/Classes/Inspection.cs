@@ -14,10 +14,10 @@ namespace Medical_Information_System_API.Classes
         public string Complaints { get; set; }
         public string Treatment { get; set; }
         public Conclusion Conclusion { get; set; }
-        public DateTime NextVisitDate { get; set; }
-        public DateTime DeathDate { get; set; }
-        public Guid BaseInspectionId { get; set; }
-        public Guid PreviousInspectionId { get; set; }
+        public DateTime? NextVisitDate { get; set; }
+        public DateTime? DeathDate { get; set; }
+        public Guid? BaseInspectionId { get; set; }
+        public Guid? PreviousInspectionId { get; set; }
         public PatientModel Patient { get; set; }
         public DoctorDatabase Doctor { get; set; }
         public List<Diagnose> Diagnoses { get; set; }
@@ -47,7 +47,7 @@ namespace Medical_Information_System_API.Classes
             Conclusion = inspection.Conclusion;
             NextVisitDate = inspection.NextVisitDate;
             DeathDate = inspection.DeathDate;
-            
+
         }
     }
 }
