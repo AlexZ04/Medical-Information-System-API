@@ -26,6 +26,7 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .Include(x => x.Consultations).ThenInclude(c => c.Speciality)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (insp == null) return BadRequest();
@@ -42,6 +43,7 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .Include(x => x.Consultations).ThenInclude(c => c.Speciality)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (insp == null) return BadRequest();

@@ -30,9 +30,6 @@ namespace Medical_Information_System_API.Data
             builder.Entity<DoctorDatabase>().ToTable("doctor");
 
             builder.Entity<SpecialityModel>().HasKey(x => x.Id);
-            builder.Entity<SpecialityModel>().HasData(
-                CreateSpecialitiesList()
-            );
             builder.Entity<SpecialityModel>().ToTable("speciality");
 
             builder.Entity<PatientModel>().HasKey(x => x.Id);
@@ -55,32 +52,6 @@ namespace Medical_Information_System_API.Data
             builder.Entity<Comment>().ToTable("comment");
 
             base.OnModelCreating(builder);
-        }
-
-        private List<SpecialityModel> CreateSpecialitiesList()
-        {
-            List<SpecialityModel> list = new List<SpecialityModel>() {
-                new SpecialityModel("Акушер-гинеколог"),
-                new SpecialityModel("Анестезиолог-реаниматолог"),
-                new SpecialityModel("Дерматовенеролог"),
-                new SpecialityModel("Инфекционист"),
-                new SpecialityModel("Кардиолог"),
-                new SpecialityModel("Невролог"),
-                new SpecialityModel("Онколог"),
-                new SpecialityModel("Отоларинголог"),
-                new SpecialityModel("Офтальмолог"),
-                new SpecialityModel("Психиатр"),
-                new SpecialityModel("Психолог"),
-                new SpecialityModel("Рентгенолог"),
-                new SpecialityModel("Стоматолог"),
-                new SpecialityModel("Терапевт"),
-                new SpecialityModel("УЗИ-специалист"),
-                new SpecialityModel("Уролог"),
-                new SpecialityModel("Хирург"),
-                new SpecialityModel("Эндокринолог"),
-            };
-
-            return list;
         }
 
         public bool CheckToken(string token)

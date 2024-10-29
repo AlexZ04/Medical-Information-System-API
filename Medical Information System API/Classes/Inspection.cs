@@ -14,9 +14,13 @@ namespace Medical_Information_System_API.Classes
         public string Complaints { get; set; }
         public string Treatment { get; set; }
         public Conclusion Conclusion { get; set; }
+        [AllowNull]
         public DateTime? NextVisitDate { get; set; }
+        [AllowNull]
         public DateTime? DeathDate { get; set; }
+        [AllowNull]
         public Guid? BaseInspectionId { get; set; }
+        [AllowNull]
         public Guid? PreviousInspectionId { get; set; }
         public PatientModel Patient { get; set; }
         public DoctorDatabase Doctor { get; set; }

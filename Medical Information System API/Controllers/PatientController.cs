@@ -104,6 +104,19 @@ namespace Medical_Information_System_API.Controllers
             return Ok(inspectionId);
         }
 
+        [HttpGet("{id}/inspections")]
+        [Authorize]
+        public async Task<IActionResult> GetInspectionsList(Guid id)
+        {
+            var inspections = await _context.Inspections
+                .Include(x => x.Patient).Include(x => x.Doctor)
+                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .Where(x => x.Patient.Id == id).ToListAsync();
+
+            return Ok(inspections);
+        }
+
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetPatientCard(Guid id)
@@ -111,6 +124,29 @@ namespace Medical_Information_System_API.Controllers
             var patient = await _context.Patients.FindAsync(id);
 
             return patient != null ? Ok(patient) : NotFound();
+        }
+
+        [HttpGet("{id}/inspection/search")]
+        [Authorize]
+        public async Task<IActionResult> SearchInspWithoutChild(Guid id)
+        {
+            List<Inspection> result = new List<Inspection>();
+
+            var inspections = await _context.Inspections
+                .Include(x => x.Patient).Include(x => x.Doctor)
+                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .Include(x => x.Consultations).ThenInclude(c => c.Speciality)
+                .Where(x => x.Patient.Id == id).ToListAsync();
+
+            foreach (var inspection in inspections)
+            {
+                var childInsp = await _context.Inspections.FirstOrDefaultAsync(x => x.PreviousInspectionId == inspection.Id);
+
+                if (childInsp == null) result.Add(inspection);
+            }
+
+            return Ok(result);
         }
 
     }

@@ -19,13 +19,13 @@ namespace Medical_Information_System_API.Models
         public string Treatment { get; set; }
         public Conclusion Conclusion { get; set; }
         [AllowNull]
-        public DateTime NextVisitDate { get; set; }
+        public DateTime? NextVisitDate { get; set; }
         [AllowNull]
-        public DateTime DeathDate { get; set; }
+        public DateTime? DeathDate { get; set; }
         [AllowNull]
-        public Guid BaseInspectionId { get; set; }
+        public Guid? BaseInspectionId { get; set; }
         [AllowNull]
-        public Guid PreviousInspectionId { get; set; }
+        public Guid? PreviousInspectionId { get; set; }
         public PatientModel Patient { get; set; }
         public DoctorModel Doctor { get; set; }
         [AllowNull]
