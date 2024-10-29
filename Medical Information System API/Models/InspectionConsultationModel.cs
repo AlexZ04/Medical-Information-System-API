@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Classes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Medical_Information_System_API.Models
 {
@@ -12,5 +13,17 @@ namespace Medical_Information_System_API.Models
         public SpecialityModel Speciality { get; set; }
         public InspectionCommentModel RootComment { get; set; }
         public int CommentsNumber { get; set; }
+
+        public InspectionConsultationModel(Consultation cons)
+        {
+            Id = cons.Id;
+            CreateTime = cons.CreateTime;
+            InspectionId = cons.InspectionId;
+            Speciality = cons.Speciality;
+
+            RootComment = new InspectionCommentModel(cons.Comments[0]);
+
+            CommentsNumber = cons.Comments.Count;
+        }
     }
 }

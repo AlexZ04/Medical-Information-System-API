@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Classes;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Models
@@ -19,5 +20,17 @@ namespace Medical_Information_System_API.Models
         public string Description { get; set; }
         [Required]
         public DiagnosisType Type { get; set; }
+
+        public DiagnosisModel(Diagnose diagnose)
+        {
+            Id = diagnose.Id;
+            CreateTime = diagnose.CreateTime;
+            Description = diagnose.Description;
+
+            Code = diagnose.Record.Code;
+            Name = diagnose.Record.Name;
+
+            Type = diagnose.Type;
+        }
     }
 }
