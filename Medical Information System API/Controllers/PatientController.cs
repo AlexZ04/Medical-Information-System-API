@@ -1,8 +1,11 @@
-﻿using Medical_Information_System_API.Data;
+﻿using Medical_Information_System_API.Classes;
+using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Medical_Information_System_API.Controllers
 {
@@ -44,9 +47,61 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpPost("{id}/inspections")]
         [Authorize]
-        public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspect)
+        public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspection)
         {
-            return Ok();
+            var patient = await _context.Patients.FindAsync(id);
+
+            if (patient == null) return BadRequest();
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
+
+            if (loginnedDoctor == null) return Unauthorized();
+
+            List<Diagnose> diagnosesList = new List<Diagnose>();
+
+            foreach (var diagnoseModel in inspection.Diagnoses)
+            {
+                var Icd10Rec = await _context.Icd10.FindAsync(diagnoseModel.IcdDiagnosisId);
+
+                if (Icd10Rec == null) return BadRequest();
+
+                var createdDiagnose = new Diagnose(diagnoseModel, Icd10Rec);
+
+                diagnosesList.Add(createdDiagnose);
+                _context.Diagnoses.Add(createdDiagnose);
+            }
+
+            List<Consultation> consultationList = new List<Consultation>();
+
+            var inspectionId = Guid.NewGuid();
+
+            foreach (var consultationModel in inspection.Consultations)
+            {
+                var speciality = await _context.SpecialitiesList.FindAsync(consultationModel.SpecialityId);
+
+                if (speciality == null) return BadRequest();
+
+                var commentModel = consultationModel.Comment;
+                var createComment = new Comment(commentModel, loginnedDoctor);
+
+                _context.Comments.Add(createComment);
+
+                var createdConsultation = new Consultation(speciality, inspectionId, createComment);
+
+                consultationList.Add(createdConsultation);
+                _context.Consultations.Add(createdConsultation);
+            }
+
+            var createdInspection = new Inspection(inspection, patient, loginnedDoctor, diagnosesList, consultationList, inspectionId);
+            _context.Inspections.Add(createdInspection);
+            await _context.SaveChangesAsync();
+
+            return Ok(inspectionId);
         }
 
         [HttpGet("{id}")]

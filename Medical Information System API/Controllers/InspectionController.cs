@@ -6,6 +6,7 @@ namespace Medical_Information_System_API.Controllers
     [Route("api/inspection")]
     public class InspectionController : Controller
     {
+        [HttpGet]
         public IActionResult Index()
         {
             return View();

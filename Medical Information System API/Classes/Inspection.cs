@@ -28,5 +28,26 @@ namespace Medical_Information_System_API.Classes
             Diagnoses = new List<Diagnose>();
             Consultations = new List<Consultation>();
         }
+
+        public Inspection(InspectionCreateModel inspection, PatientModel patient,
+            DoctorDatabase doctor, List<Diagnose> diagnoses, List<Consultation> consultations, Guid inspectionId)
+        {
+            Id = inspectionId;
+            CreateTime = DateTime.Now.ToUniversalTime();
+
+            Patient = patient;
+            Doctor = doctor;
+            Diagnoses = diagnoses;
+            Consultations = consultations;
+
+            Date = inspection.Date;
+            Anamnesis = inspection.Anamnesis;
+            Complaints = inspection.Complaints;
+            Treatment = inspection.Treatment;
+            Conclusion = inspection.Conclusion;
+            NextVisitDate = inspection.NextVisitDate;
+            DeathDate = inspection.DeathDate;
+            
+        }
     }
 }

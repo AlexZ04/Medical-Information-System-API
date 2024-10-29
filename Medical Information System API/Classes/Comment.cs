@@ -16,5 +16,13 @@ namespace Medical_Information_System_API.Classes
         public Guid ParentId { get; set; }
 
         public Comment() { }
+
+        public Comment(InspectionCommentCreateModel comment, DoctorDatabase doctor)
+        {
+            Author = doctor;
+            Id = Guid.NewGuid();
+            CreateTime = DateTime.Now.ToUniversalTime();
+            Content = comment.Context;
+        }
     }
 }

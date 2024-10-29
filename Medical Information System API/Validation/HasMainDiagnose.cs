@@ -7,10 +7,9 @@ namespace Medical_Information_System_API.Validation
     {
         public override bool IsValid(object? value)
         {
-            var model = value as InspectionCreateModel;
-            if (model == null) return false;
+            var diagnoses = value as List<DiagnosisCreateModel>;
+            if (diagnoses == null) return false;
 
-            var diagnoses = model.Diagnoses;
             int counter = 0;
 
             foreach (var diagnose in diagnoses)

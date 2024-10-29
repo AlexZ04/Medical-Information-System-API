@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Medical_Information_System_API.Validation
 {
@@ -13,8 +14,8 @@ namespace Medical_Information_System_API.Validation
 
         public override bool IsValid(object? value)
         {
-            var list = value as Array;
-            if (list == null || list.Length < _length)
+            var list = value as List<DiagnosisCreateModel>;
+            if (list == null || list.Count < _length)
             {
                 return false;
             }

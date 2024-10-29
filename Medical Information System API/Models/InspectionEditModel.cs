@@ -22,6 +22,6 @@ namespace Medical_Information_System_API.Models
         [AllowNull]
         public DateTime DeathDate { get; set; }
         [MinItems(1, ErrorMessage = "Array must contain at least 1 element.")]
-        public DiagnosisCreateModel Diagnoses { get; set; }
+        public List<DiagnosisCreateModel> Diagnoses { get; set; }
     }
 }
