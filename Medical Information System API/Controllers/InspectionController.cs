@@ -1,4 +1,5 @@
-﻿using Medical_Information_System_API.Data;
+﻿using Medical_Information_System_API.Classes;
+using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +22,63 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> GetInspectionInfo(Guid id)
         {
-            var insp = _context.Inspections
+            var insp = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (insp == null) return BadRequest();
 
             var res = new InspectionModel(insp);
             return Ok(res);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> EditInspection(Guid id, [FromBody] InspectionEditModel model)
+        {
+            var insp = await _context.Inspections
+                .Include(x => x.Patient).Include(x => x.Doctor)
+                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (insp == null) return BadRequest();
+
+            insp.Anamnesis = model.Anamnesis;
+            insp.Complaints = model.Complaints;
+            insp.Treatment = model.Treatment;
+            insp.Conclusion = model.Conclusion;
+            insp.NextVisitDate = model.NextVisitDate;
+            insp.DeathDate = model.DeathDate;
+
+            var diagnoses = model.Diagnoses;
+
+            List<Diagnose> newDiagnoses = new List<Diagnose>();
+
+            foreach (var diagnose in insp.Diagnoses)
+            {
+                _context.Diagnoses.Remove(diagnose);
+            }
+
+            foreach (var diagnose in diagnoses)
+            {
+                var Icd10Rec = await _context.Icd10.FindAsync(diagnose.IcdDiagnosisId);
+
+                if (Icd10Rec == null) return BadRequest();
+
+                var createdDiagnose = new Diagnose(diagnose, Icd10Rec);
+
+                newDiagnoses.Add(createdDiagnose);
+                _context.Diagnoses.Add(createdDiagnose);
+            }
+
+            insp.Diagnoses = newDiagnoses;
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }
