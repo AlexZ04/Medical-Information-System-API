@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Classes;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Models
 {
@@ -7,8 +9,9 @@ namespace Medical_Information_System_API.Models
         [Required]
         public Guid Id { get; set; }
         [Required]
-        public Guid CreateTime { get; set; }
-        public Guid PreviousId { get; set; }
+        public DateTime CreateTime { get; set; }
+        [AllowNull]
+        public Guid? PreviousId { get; set; }
         [Required]
         public DateTime Date { get; set; }
         [Required]
@@ -27,5 +30,30 @@ namespace Medical_Information_System_API.Models
         public DiagnosisModel Diagnosis { get; set; }
         public bool HasChain { get; set; }
         public bool HasNested { get; set; }
+
+        public InspectionPreviewModel(Inspection insp, bool hasChain, bool hasNested)
+        {
+            Id = insp.Id;
+            CreateTime = insp.CreateTime;
+            PreviousId = insp.PreviousInspectionId;
+            Date = insp.Date;
+            Conclusion = insp.Conclusion;
+            DoctorId = insp.Doctor.Id;
+            Doctor = insp.Doctor.Name;
+            PatientId = insp.Patient.Id;
+            Patient = insp.Patient.Name;
+
+            foreach (var diag in insp.Diagnoses)
+            {
+                if (diag.Type == DiagnosisType.Main)
+                {
+                    Diagnosis = new DiagnosisModel(diag);
+                    break;
+                }
+            }
+
+            HasChain = hasChain;
+            HasNested = hasNested;
+        }
     }
 }

@@ -9,11 +9,11 @@ namespace Medical_Information_System_API.Classes
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; }
         [AllowNull]
-        public DateTime ModifiedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
         public string Content { get; set; }
         public DoctorDatabase Author { get; set; }
         [AllowNull]
-        public Guid ParentId { get; set; }
+        public Guid? ParentId { get; set; }
 
         public Comment() { }
 

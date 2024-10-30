@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 
 namespace Medical_Information_System_API.Controllers
 {
@@ -106,15 +107,45 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet("{id}/inspections")]
         [Authorize]
-        public async Task<IActionResult> GetInspectionsList(Guid id)
+        public async Task<IActionResult> GetInspectionsList(Guid id, int page = 1, int size = 5)
         {
             var inspections = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
-                .Where(x => x.Patient.Id == id).ToListAsync();
+                .Where(x => x.Patient.Id == id)
+                .Skip((page - 1) * size).Take(size)
+                .ToListAsync();
 
-            return Ok(inspections);
+            List<InspectionPreviewModel> list = new List<InspectionPreviewModel>();
+            bool hasChain = false, hasNested = false;
+
+            foreach (var inspection in inspections) {
+                var childInsp = await _context.Inspections.FirstOrDefaultAsync(x => x.PreviousInspectionId == inspection.Id);
+
+                if (childInsp != null) {
+                    hasNested = true;
+
+                    if (inspection.PreviousInspectionId != null) hasChain = false;
+                    else hasChain = true;
+                }
+                else
+                {
+                    hasChain = false;
+                    hasNested = false;
+                }
+
+                var previewModel = new InspectionPreviewModel(inspection, hasChain, hasNested);
+
+                list.Add(previewModel);
+            }
+
+            var amount = await _context.Inspections.CountAsync();
+            var count = (int)Math.Ceiling(amount * 1.0 / size);
+
+            var res = new InspectionPagedListModel(list, new PageInfoModel(size, count, page));
+
+            return Ok(res);
         }
 
         [HttpGet("{id}")]

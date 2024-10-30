@@ -11,11 +11,11 @@ namespace Medical_Information_System_API.Models
         [Required]
         public DateTime CreateTime { get; set; }
         [AllowNull]
-        public Guid ParentId { get; set; }
+        public Guid? ParentId { get; set; }
         [AllowNull]
         public string Content { get; set; }
         public DoctorModel Author { get; set; }
-        public DateTime ModifyTime { get; set; }
+        public DateTime? ModifyTime { get; set; }
 
         public InspectionCommentModel(Comment com)
         {

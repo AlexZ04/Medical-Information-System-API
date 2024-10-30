@@ -95,22 +95,20 @@ namespace Medical_Information_System_API.Controllers
 
             if (insp == null) return BadRequest();
 
-            List<Inspection> chain = new List<Inspection>();
+            List<InspectionPreviewModel> chain = new List<InspectionPreviewModel>();
             bool flag = true;
             Guid currentId = insp.Id;
 
             while (flag)
             {
-                var nextInsp = await _context.Inspections
-                    .Include(x => x.Patient).Include(x => x.Doctor)
-                    .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
-                    .Include(x => x.Consultations).ThenInclude(c => c.Comments)
-                    .FirstOrDefaultAsync(x => x.Id == currentId);
+                var nextInsp = await _context.Inspections.FirstOrDefaultAsync(x => x.PreviousInspectionId == currentId);
 
                 if (nextInsp == null) flag = false;
                 else
                 {
-                    chain.Add(nextInsp);
+                    chain.Add(new InspectionPreviewModel(nextInsp, false,
+                        await _context.Inspections.FirstOrDefaultAsync(x => x.PreviousInspectionId == nextInsp.Id) != null
+                        ));
                     currentId = nextInsp.Id;
                 }
                 

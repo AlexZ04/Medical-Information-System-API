@@ -9,5 +9,9 @@ namespace Medical_Information_System_API.Models
         public List<InspectionPreviewModel> Inspections { get; set; }
         public PageInfoModel Pagination { get; set; }
 
+        public InspectionPagedListModel(List<InspectionPreviewModel> inspections, PageInfoModel pagination) { 
+            Inspections = inspections;
+            Pagination = pagination;
+        }
     }
 }
