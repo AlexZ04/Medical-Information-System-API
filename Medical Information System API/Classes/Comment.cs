@@ -24,5 +24,14 @@ namespace Medical_Information_System_API.Classes
             CreateTime = DateTime.Now.ToUniversalTime();
             Content = comment.Context;
         }
+
+        public Comment(CommentCreateModel comment, DoctorDatabase doctor)
+        {
+            Author = doctor;
+            Id = Guid.NewGuid();
+            CreateTime = DateTime.Now.ToUniversalTime();
+            Content = comment.Content;
+            ParentId = comment.ParentId;
+        }
     }
 }
