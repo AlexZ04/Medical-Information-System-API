@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Medical_Information_System_API.Classes;
 using System.Text.Json.Serialization;
 using System.Reflection;
+using Medical_Information_System_API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +92,35 @@ if (app.Environment.IsDevelopment())
 using var serviceScope = app.Services.CreateScope();
 var context = serviceScope.ServiceProvider.GetService<DataContext>();
 context?.Database.Migrate();
+
+List<string> dependentTables = new List<string>() { "diagnose", "comment", "consultation", "inspection" };
+
+if (builder.Configuration["EnterSpecialities"] == "1" && context != null)
+{
+    foreach (var table in dependentTables)
+    {
+        context.Database.ExecuteSql($"DELETE FROM {table}");
+    }
+    
+    context.Database.ExecuteSqlRaw("DELETE FROM speciality");
+
+    context.SpecialitiesList.AddRange(db.GetSpecList());
+
+    await context.SaveChangesAsync();
+}
+
+if (builder.Configuration["EnterIcdData"] == "1" && context != null)
+{
+    foreach (var table in dependentTables)
+    {
+        context.Database.ExecuteSql($"DELETE FROM {table}");
+    }
+
+    context.Database.ExecuteSqlRaw("DELETE FROM icd10");
+
+    context.Icd10.AddRange(new Icd10Manager().GetListIcd10());
+    await context.SaveChangesAsync();
+}
 
 app.UseHttpsRedirection();
 

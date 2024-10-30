@@ -130,7 +130,7 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> SearchInspWithoutChild(Guid id)
         {
-            List<Inspection> result = new List<Inspection>();
+            List<InspectionShortModel> result = new List<InspectionShortModel>();
 
             var inspections = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
@@ -143,7 +143,7 @@ namespace Medical_Information_System_API.Controllers
             {
                 var childInsp = await _context.Inspections.FirstOrDefaultAsync(x => x.PreviousInspectionId == inspection.Id);
 
-                if (childInsp == null) result.Add(inspection);
+                if (childInsp == null) result.Add(new InspectionShortModel(inspection));
             }
 
             return Ok(result);

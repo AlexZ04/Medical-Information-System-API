@@ -25,34 +25,6 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("speciality")]
         public async Task<IActionResult> GetSpecialities(string name = "", int page = 1, int size = 5)
         {
-            if (_configuration["EnterSpecialities"] == "1")
-            {
-                _context.Database.ExecuteSqlRaw("DELETE FROM speciality");
-
-                _context.SpecialitiesList.AddRange(new List<SpecialityModel>() {
-                    new SpecialityModel("Акушер-гинеколог"),
-                    new SpecialityModel("Анестезиолог-реаниматолог"),
-                    new SpecialityModel("Дерматовенеролог"),
-                    new SpecialityModel("Инфекционист"),
-                    new SpecialityModel("Кардиолог"),
-                    new SpecialityModel("Невролог"),
-                    new SpecialityModel("Онколог"),
-                    new SpecialityModel("Отоларинголог"),
-                    new SpecialityModel("Офтальмолог"),
-                    new SpecialityModel("Психиатр"),
-                    new SpecialityModel("Психолог"),
-                    new SpecialityModel("Рентгенолог"),
-                    new SpecialityModel("Стоматолог"),
-                    new SpecialityModel("Терапевт"),
-                    new SpecialityModel("УЗИ-специалист"),
-                    new SpecialityModel("Уролог"),
-                    new SpecialityModel("Хирург"),
-                    new SpecialityModel("Эндокринолог"),
-                });
-
-                await _context.SaveChangesAsync();
-            }
-
             var consultationList = await _context.SpecialitiesList.OrderBy(c => c.Name).Where(c => c.Name.ToLower().Contains(name.ToLower()))
                     .Skip((page - 1) * size).Take(size).ToListAsync();
 
@@ -67,14 +39,6 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd10")]
         public async Task<IActionResult> GetDiagnoses(string request = "", int page = 1, int size = 5)
         {
-            if (_configuration["EnterIcdData"] == "1")
-            {
-                _context.Database.ExecuteSqlRaw("DELETE FROM icd10");
-
-                _context.Icd10.AddRange(new Icd10Manager().GetListIcd10());
-                await _context.SaveChangesAsync();
-            }
-
             var records = await _context.Icd10.OrderBy(d => d.Code).Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
                 d.Code.ToLower().Contains(request.ToLower()))
                 .Skip((page - 1) * size).Take(size).ToListAsync();
@@ -97,14 +61,6 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {
-            if (_configuration["EnterIcdData"] == "1")
-            {
-                _context.Database.ExecuteSqlRaw("DELETE FROM icd10");
-
-                _context.Icd10.AddRange(new Icd10Manager().GetListIcd10());
-                await _context.SaveChangesAsync();
-            }
-
             var roots = await _context.Icd10.Where(x => x.ParentId == Guid.Empty).OrderBy(x => x.Code).ToListAsync();
 
             var res = new List<Icd10RecordModel>();
