@@ -1,6 +1,6 @@
 # Medical Information System API
 To upload ICD-10 and Specialities data, put in _appsettings.json_ next values:  
-> "EnterIcdData": "1",
+> "EnterIcdData": "1",  
 > "EnterSpecialities": "1"  
 
 
