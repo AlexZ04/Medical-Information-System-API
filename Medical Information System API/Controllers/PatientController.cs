@@ -39,7 +39,7 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetPatientList([FromQuery] string name, [FromQuery] List<Conclusion> conslusion,
+        public async Task<IActionResult> GetPatientList([FromQuery] string? name, [FromQuery] List<Conclusion> conslusion,
             [FromQuery] SortOptions sorting,
             [FromQuery] bool scheduledVisits = false, [FromQuery] bool onlyMine = false, 
             [FromQuery] int page = 1, [FromQuery] int size = 5)
