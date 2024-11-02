@@ -40,7 +40,7 @@ namespace Medical_Information_System_API.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetPatientList([FromQuery] string? name, [FromQuery] List<Conclusion?> conslusion,
             [FromQuery] SortOptions? sorting,
             [FromQuery] bool scheduledVisits = false, [FromQuery] bool onlyMine = false, 
@@ -186,16 +186,26 @@ namespace Medical_Information_System_API.Controllers
         }
 
         [HttpGet("{id}/inspections")]
-        [Authorize]
-        public async Task<IActionResult> GetInspectionsList(Guid id, [FromQuery] int page = 1, [FromQuery] int size = 5)
+        //[Authorize]
+        public async Task<IActionResult> GetInspectionsList(Guid id,
+            [FromQuery] List<Guid> icdRoots, [FromQuery] bool grouped = false,
+            [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
-            var inspections = await _context.Inspections
-                .Include(x => x.Patient).Include(x => x.Doctor)
-                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
-                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
-                .Where(x => x.Patient.Id == id)
-                .Skip((page - 1) * size).Take(size)
-                .ToListAsync();
+            var inspFromContext = _context.Inspections
+                .Include(x => x.Patient)
+                .Include(x => x.Doctor)
+                .Include(x => x.Diagnoses)
+                    .ThenInclude(d => d.Record)
+                .Include(x => x.Consultations)
+                    .ThenInclude(c => c.Comments)
+                .Where(x => x.Patient.Id == id);
+
+            //if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id)));
+
+            inspFromContext = inspFromContext
+                .Skip((page - 1) * size).Take(size);
+
+            var inspections = await inspFromContext.ToListAsync();
 
             List<InspectionPreviewModel> list = new List<InspectionPreviewModel>();
             bool hasChain = false, hasNested = false;
@@ -239,16 +249,27 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet("{id}/inspection/search")]
         [Authorize]
-        public async Task<IActionResult> SearchInspWithoutChild(Guid id)
+        public async Task<IActionResult> SearchInspWithoutChild(Guid id, [FromQuery] string? request)
         {
             List<InspectionShortModel> result = new List<InspectionShortModel>();
 
+            if (request == null) request = "";
+            request = request.ToLower();
+
             var inspections = await _context.Inspections
-                .Include(x => x.Patient).Include(x => x.Doctor)
-                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
-                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
-                .Include(x => x.Consultations).ThenInclude(c => c.Speciality)
-                .Where(x => x.Patient.Id == id).ToListAsync();
+                .Include(x => x.Patient)
+                .Include(x => x.Doctor)
+                .Include(x => x.Diagnoses)
+                    .ThenInclude(d => d.Record)
+                .Include(x => x.Consultations)
+                    .ThenInclude(c => c.Comments)
+                .Include(x => x.Consultations)
+                    .ThenInclude(c => c.Speciality)
+
+                .Where(x => x.Patient.Id == id && 
+                    x.Diagnoses.Any(d => d.Record.Name.ToLower().StartsWith(request) || d.Record.Code.ToLower().Contains(request)))
+
+                .ToListAsync();
 
             foreach (var inspection in inspections)
             {
