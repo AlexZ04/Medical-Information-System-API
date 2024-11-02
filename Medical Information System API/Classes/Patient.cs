@@ -12,6 +12,7 @@ namespace Medical_Information_System_API.Classes
         public DateTime Birthday { get; set; }
         public Gender Gender { get; set; }
         public Conclusion? HealthStatus { get; set; }
+        public DateTime? LastInspectionDate { get; set; }
 
         public Patient()
         {

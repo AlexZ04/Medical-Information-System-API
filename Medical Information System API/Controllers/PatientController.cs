@@ -15,10 +15,12 @@ namespace Medical_Information_System_API.Controllers
     public class PatientController : Controller
     {
         private readonly DataContext _context;
+        private readonly ILogger<PatientController> _logger;
 
-        public PatientController(DataContext context)
+        public PatientController(DataContext context, ILogger<PatientController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -38,15 +40,90 @@ namespace Medical_Information_System_API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetPatientList([FromQuery] string? name, [FromQuery] List<Conclusion> conslusion,
-            [FromQuery] SortOptions sorting,
+        //[Authorize]
+        public async Task<IActionResult> GetPatientList([FromQuery] string? name, [FromQuery] List<Conclusion?> conslusion,
+            [FromQuery] SortOptions? sorting,
             [FromQuery] bool scheduledVisits = false, [FromQuery] bool onlyMine = false, 
             [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
-            var patientList = await _context.Patients.ToListAsync();
+            if (name == null) name = "";
 
-            return Ok(patientList);
+            var patientList = _context.Patients
+                .Where(p => p.Name.Contains(name));
+
+            patientList = patientList.Where(p => p.Name.Contains(name));
+
+            if (onlyMine) {
+                if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null) return Unauthorized();
+
+                var userId = new Guid(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                var patientsId = await _context.Inspections
+                    .Include(i => i.Patient).Include(i => i.Doctor)
+                    .Where(i => i.Doctor.Id == userId)
+                    .Select(i => i.Patient.Id).Distinct().ToListAsync();
+
+                patientList = patientList.Where(p => patientsId.Contains(p.Id));
+            }
+
+            if (scheduledVisits)
+            {
+                var patientsId = await _context.Inspections
+                    .Where(i => i.Date > DateTime.Now.ToUniversalTime())
+                    .Select(i => i.Patient.Id).Distinct().ToListAsync();
+
+                patientList = patientList.Where(p => patientsId.Contains(p.Id));
+            }
+
+            if (conslusion != null && conslusion.Count > 0)
+            {
+                patientList = patientList.Where(p => conslusion.Contains(p.HealthStatus));
+            }
+
+            switch (sorting)
+            {
+                case SortOptions.NameAsc:
+                    patientList = patientList.OrderBy(p => p.Name);
+                    break;
+
+                case SortOptions.NameDesc:
+                    patientList = patientList.OrderByDescending(p => p.Name);
+                    break;
+
+                case SortOptions.CreateAsc:
+                    patientList = patientList.OrderBy(p => p.CreateTime);
+                    break;
+
+                case SortOptions.CreateDesc:
+                    patientList = patientList.OrderByDescending(p => p.CreateTime);
+                    break;
+
+                case SortOptions.InspectionAsc:
+                    patientList = patientList.OrderBy(p => p.LastInspectionDate);
+                    break;
+
+                case SortOptions.InspectionDesc:
+                    patientList = patientList.OrderByDescending(p => p.LastInspectionDate);
+                    break;
+            }
+
+            patientList = patientList.Skip((page - 1) * size).Take(size);
+
+            int amount = await patientList.CountAsync();
+            var patientRes = await patientList.ToListAsync();
+
+            var resList = new List<PatientModel>();
+
+            foreach (var patient in patientRes)
+            {
+                resList.Add(new PatientModel(patient));
+            }
+
+            var count = (int)Math.Ceiling(amount * 1.0 / size);
+
+            var resModel = new PatientPagedListModel(resList, new PageInfoModel(size, count, page));
+
+            return Ok(resModel);
         }
 
         [HttpPost("{id}/inspections")]

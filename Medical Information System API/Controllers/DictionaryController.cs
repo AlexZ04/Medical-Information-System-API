@@ -25,6 +25,8 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("speciality")]
         public async Task<IActionResult> GetSpecialities([FromQuery] string? name, [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
+            if (name == null) name = "";
+
             var consultationList = await _context.SpecialitiesList.OrderBy(c => c.Name).Where(c => c.Name.ToLower().Contains(name.ToLower()))
                     .Skip((page - 1) * size).Take(size).ToListAsync();
 
@@ -39,9 +41,13 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd10")]
         public async Task<IActionResult> GetDiagnoses([FromQuery] string? request, [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
-            var records = await _context.Icd10.OrderBy(d => d.Code).Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
+            if (request == null) request = "";
+
+            var recordsData = _context.Icd10.OrderBy(d => d.Code).Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
                 d.Code.ToLower().Contains(request.ToLower()))
-                .Skip((page - 1) * size).Take(size).ToListAsync();
+                .Skip((page - 1) * size).Take(size);
+
+            var records = await recordsData.ToListAsync();
 
             var diagnosesList = new List<Icd10RecordModel>();
             foreach (var record in records)
