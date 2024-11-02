@@ -22,7 +22,7 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetInspections(int page = 1, int size = 5)
+        public async Task<IActionResult> GetInspections([FromQuery] int page = 1, [FromQuery] int size = 5)
         {
             var inspections = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)

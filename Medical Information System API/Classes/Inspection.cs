@@ -22,7 +22,7 @@ namespace Medical_Information_System_API.Classes
         public Guid? BaseInspectionId { get; set; }
         [AllowNull]
         public Guid? PreviousInspectionId { get; set; }
-        public PatientModel Patient { get; set; }
+        public Patient Patient { get; set; }
         public DoctorDatabase Doctor { get; set; }
         public List<Diagnose> Diagnoses { get; set; }
         public List<Consultation> Consultations { get; set; }
@@ -33,7 +33,7 @@ namespace Medical_Information_System_API.Classes
             Consultations = new List<Consultation>();
         }
 
-        public Inspection(InspectionCreateModel inspection, PatientModel patient,
+        public Inspection(InspectionCreateModel inspection, Patient patient,
             DoctorDatabase doctor, List<Diagnose> diagnoses, List<Consultation> consultations, Guid inspectionId)
         {
             Id = inspectionId;

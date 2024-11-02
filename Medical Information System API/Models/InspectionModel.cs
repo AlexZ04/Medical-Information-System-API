@@ -26,7 +26,7 @@ namespace Medical_Information_System_API.Models
         public Guid? BaseInspectionId { get; set; }
         [AllowNull]
         public Guid? PreviousInspectionId { get; set; }
-        public PatientModel Patient { get; set; }
+        public Patient Patient { get; set; }
         public DoctorModel Doctor { get; set; }
         [AllowNull]
         public List<DiagnosisModel> Diagnoses { get; set; }

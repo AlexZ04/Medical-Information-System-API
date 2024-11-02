@@ -30,7 +30,7 @@ namespace Medical_Information_System_API.Controllers
                 return BadRequest();
             }
 
-            var patient = new PatientModel(patientCreateModel);
+            var patient = new Patient(patientCreateModel);
             _context.Patients.Add(patient);
             await _context.SaveChangesAsync();
 
@@ -39,7 +39,10 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetPatientList()
+        public async Task<IActionResult> GetPatientList([FromQuery] string name, [FromQuery] List<Conclusion> conslusion,
+            [FromQuery] SortOptions sorting,
+            [FromQuery] bool scheduledVisits = false, [FromQuery] bool onlyMine = false, 
+            [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
             var patientList = await _context.Patients.ToListAsync();
 
@@ -107,7 +110,7 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet("{id}/inspections")]
         [Authorize]
-        public async Task<IActionResult> GetInspectionsList(Guid id, int page = 1, int size = 5)
+        public async Task<IActionResult> GetInspectionsList(Guid id, [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
             var inspections = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
@@ -154,7 +157,7 @@ namespace Medical_Information_System_API.Controllers
         {
             var patient = await _context.Patients.FindAsync(id);
 
-            return patient != null ? Ok(patient) : NotFound();
+            return patient != null ? Ok(new PatientModel(patient)) : NotFound();
         }
 
         [HttpGet("{id}/inspection/search")]

@@ -14,7 +14,7 @@ namespace Medical_Information_System_API.Data
         public DbSet<BlacklistToken> BlacklistTokens { get; set; }
 
         public DbSet<DoctorDatabase> Doctors { get; set; }
-        public DbSet<PatientModel> Patients { get; set; }
+        public DbSet<Patient> Patients { get; set; }
 
         public DbSet<SpecialityModel> SpecialitiesList { get; set; }
         public DbSet<Icd10Record> Icd10 { get; set; }
@@ -32,8 +32,8 @@ namespace Medical_Information_System_API.Data
             builder.Entity<SpecialityModel>().HasKey(x => x.Id);
             builder.Entity<SpecialityModel>().ToTable("speciality");
 
-            builder.Entity<PatientModel>().HasKey(x => x.Id);
-            builder.Entity<PatientModel>().ToTable("patient");
+            builder.Entity<Patient>().HasKey(x => x.Id);
+            builder.Entity<Patient>().ToTable("patient");
 
             builder.Entity<BlacklistToken>().HasKey(x => x.Token);
             builder.Entity<BlacklistToken>().ToTable("tokenBlacklist");

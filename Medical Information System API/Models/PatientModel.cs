@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Medical_Information_System_API.Classes;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Medical_Information_System_API.Models
@@ -29,6 +30,15 @@ namespace Medical_Information_System_API.Models
             Name = model.Name;
             Birthday = model.Birthday;
             Gender = model.Gender;
+        }
+
+        public PatientModel(Patient patient)
+        {
+            Id = patient.Id;
+            CreateTime = patient.CreateTime;
+            Name = patient.Name;
+            Birthday = patient.Birthday;
+            Gender = patient.Gender;
         }
     }
 }
