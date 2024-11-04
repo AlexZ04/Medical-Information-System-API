@@ -178,7 +178,22 @@ namespace Medical_Information_System_API.Controllers
                 _context.Consultations.Add(createdConsultation);
             }
 
-            var createdInspection = new Inspection(inspection, patient, loginnedDoctor, diagnosesList, consultationList, inspectionId);
+            int groupNumber = 0;
+            if (inspection.PreviousInspectionId != null)
+            {
+                var parentId = _context.Inspections.Find(inspection.PreviousInspectionId);
+                groupNumber = parentId.Group;
+            }
+            else
+            {
+                var lastAddedInsp = _context.Inspections.OrderByDescending(x => x.CreateTime).First();
+                if (lastAddedInsp != null) {
+                    groupNumber = lastAddedInsp.Group + 1;
+                }
+            }
+
+            var createdInspection = new Inspection(inspection, patient, loginnedDoctor, diagnosesList, consultationList,
+                inspectionId, groupNumber);
             _context.Inspections.Add(createdInspection);
             await _context.SaveChangesAsync();
 
@@ -186,7 +201,7 @@ namespace Medical_Information_System_API.Controllers
         }
 
         [HttpGet("{id}/inspections")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetInspectionsList(Guid id,
             [FromQuery] List<Guid> icdRoots, [FromQuery] bool grouped = false,
             [FromQuery] int page = 1, [FromQuery] int size = 5)
@@ -200,7 +215,16 @@ namespace Medical_Information_System_API.Controllers
                     .ThenInclude(c => c.Comments)
                 .Where(x => x.Patient.Id == id);
 
-            //if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id)));
+            if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id) &&
+            d.Type == DiagnosisType.Main && d.Record.ParentId == Guid.Empty));
+
+            if (grouped)
+            {
+                // фильтрация по критерию “Сгруппировать по повторным” -
+                // при выборе данного критерия осмотры группируются в цепочки взаимосвязанных осмотров
+                inspFromContext = inspFromContext.
+                    OrderBy(x => x.Group).ThenBy(x => x.CreateTime);
+            }
 
             inspFromContext = inspFromContext
                 .Skip((page - 1) * size).Take(size);

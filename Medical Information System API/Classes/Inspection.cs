@@ -26,15 +26,17 @@ namespace Medical_Information_System_API.Classes
         public DoctorDatabase Doctor { get; set; }
         public List<Diagnose> Diagnoses { get; set; }
         public List<Consultation> Consultations { get; set; }
+        public int Group { get; set; }
 
         public Inspection()
         {
             Diagnoses = new List<Diagnose>();
             Consultations = new List<Consultation>();
+            Group = 0;
         }
 
         public Inspection(InspectionCreateModel inspection, Patient patient,
-            DoctorDatabase doctor, List<Diagnose> diagnoses, List<Consultation> consultations, Guid inspectionId)
+            DoctorDatabase doctor, List<Diagnose> diagnoses, List<Consultation> consultations, Guid inspectionId, int groupNumber)
         {
             Id = inspectionId;
             CreateTime = DateTime.Now.ToUniversalTime();
@@ -52,6 +54,7 @@ namespace Medical_Information_System_API.Classes
             NextVisitDate = inspection.NextVisitDate;
             DeathDate = inspection.DeathDate;
 
+            Group = groupNumber;
         }
     }
 }
