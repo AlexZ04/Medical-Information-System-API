@@ -22,14 +22,35 @@ namespace Medical_Information_System_API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetInspections([FromQuery] int page = 1, [FromQuery] int size = 5)
+        public async Task<IActionResult> GetInspections([FromQuery] bool grouped, [FromQuery] List<Guid> icdRoots,
+            [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
-            var inspections = await _context.Inspections
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
+
+            if (loginnedDoctor == null) return Unauthorized();
+
+            var inspList = _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
-                .Skip((page - 1) * size).Take(size)
-                .ToListAsync();
+                .Where(x => x.Doctor.Speciality == loginnedDoctor.Speciality);
+
+            if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id) &&
+            d.Type == DiagnosisType.Main && d.Record.ParentId == Guid.Empty));
+
+            if (grouped)
+            {
+                inspList = inspList.
+                    OrderBy(x => x.Group).ThenBy(x => x.CreateTime);
+            }
+
+            inspList = inspList.Skip((page - 1) * size).Take(size);
+            var inspections = await inspList.ToListAsync();
 
             List<InspectionPreviewModel> list = new List<InspectionPreviewModel>();
             bool hasChain = false, hasNested = false;
