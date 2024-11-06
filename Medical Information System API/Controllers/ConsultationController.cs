@@ -29,13 +29,13 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Not found</response>
         /// <response code="500">InternalServerError</response>
-        [HttpGet]
-        [Authorize]
         [ProducesResponseType(typeof(InspectionPagedListModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetInspections([FromQuery] bool grouped, [FromQuery] List<Guid> icdRoots,
             [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
@@ -125,14 +125,14 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Consultation or parent comment not found</response>
         /// <response code="500">InternalServerError</response>
-        [HttpGet("{id}")]
-        [Authorize]
         [ProducesResponseType(typeof(ConsultationModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
+        [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetConcreteConsultation(Guid id)
         {
             var token = HttpContext.GetTokenAsync("access_token").Result;
@@ -160,14 +160,14 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="406">User doesn't have add comment to consultation 
         /// (unsuitable specialty and not the inspection author)</response>
         /// <response code="500">InternalServerError</response>
-        [HttpPost("{id}/comment")]
-        [Authorize]
         [ProducesResponseType(typeof(GuidResponseModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
+        [HttpPost("{id}/comment")]
+        [Authorize]
         public async Task<IActionResult> AddComment(Guid id, [FromBody] CommentCreateModel comment)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -211,6 +211,12 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="404">Comment not found</response>
         /// <response code="406">User is not the author of the comment</response>
         /// <response code="500">InternalServerError</response>
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPut("comment/{id}")]
         [Authorize]
         public async Task<IActionResult> EditComment(Guid id, [FromBody] InspectionCommentCreateModel newComment)
