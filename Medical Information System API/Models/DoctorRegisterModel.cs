@@ -17,12 +17,12 @@ namespace Medical_Information_System_API.Models
         [EmailAddress]
         public string Email { get; set; }
         [AllowNull]
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
         [Required]
         public Gender Gender { get; set; }
         [Phone]
         [AllowNull]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         [Required]
         public Guid Speciality { get; set; }
     }

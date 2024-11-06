@@ -17,7 +17,7 @@ namespace Medical_Information_System_API.Models
         [MinLength(1, ErrorMessage = "Invalid name field length.")]
         public string Name { get; set; }
         [AllowNull]
-        public string Description { get; set; }
+        public string? Description { get; set; }
         [Required]
         public DiagnosisType Type { get; set; }
 

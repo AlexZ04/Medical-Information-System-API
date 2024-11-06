@@ -13,7 +13,7 @@ namespace Medical_Information_System_API.Models
         [AllowNull]
         public Guid? ParentId { get; set; }
         [AllowNull]
-        public string Content { get; set; }
+        public string? Content { get; set; }
         public DoctorModel Author { get; set; }
         public DateTime? ModifyTime { get; set; }
 

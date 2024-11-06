@@ -14,11 +14,11 @@ namespace Medical_Information_System_API.Models
         [StringLength(1000, MinimumLength = 1, ErrorMessage = "Invalid length of name field.")]
         public string Name { get; set; }
         [AllowNull]
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
         [Required]
         public Gender Gender { get; set; }
         [AllowNull]
         [Phone]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
     }
 }

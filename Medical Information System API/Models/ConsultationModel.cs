@@ -13,7 +13,7 @@ namespace Medical_Information_System_API.Models
         public Guid InspectionId { get; set; }
         public SpecialityModel Speciality { get; set; }
         [AllowNull]
-        public List<CommentModel> Comments { get; set; }
+        public List<CommentModel>? Comments { get; set; }
 
         public ConsultationModel(Consultation consultation)
         {

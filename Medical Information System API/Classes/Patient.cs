@@ -9,7 +9,7 @@ namespace Medical_Information_System_API.Classes
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; }
         public string Name { get; set; }
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
         public Gender Gender { get; set; }
         public Conclusion? HealthStatus { get; set; }
         public DateTime? LastInspectionDate { get; set; }

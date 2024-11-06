@@ -12,11 +12,11 @@ namespace Medical_Information_System_API.Models
         public DateTime CreateTime { get; set; }
         public DateTime Date { get; set; }
         [AllowNull]
-        public string Anamnesis { get; set; }
+        public string? Anamnesis { get; set; }
         [AllowNull]
-        public string Complaints { get; set; }
+        public string? Complaints { get; set; }
         [AllowNull]
-        public string Treatment { get; set; }
+        public string? Treatment { get; set; }
         public Conclusion Conclusion { get; set; }
         [AllowNull]
         public DateTime? NextVisitDate { get; set; }
@@ -29,9 +29,9 @@ namespace Medical_Information_System_API.Models
         public PatientModel Patient { get; set; }
         public DoctorModel Doctor { get; set; }
         [AllowNull]
-        public List<DiagnosisModel> Diagnoses { get; set; }
+        public List<DiagnosisModel>? Diagnoses { get; set; }
         [AllowNull]
-        public List<InspectionConsultationModel> Consultations { get; set; }
+        public List<InspectionConsultationModel>? Consultations { get; set; }
 
         public InspectionModel(Inspection insp)
         {

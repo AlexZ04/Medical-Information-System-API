@@ -8,7 +8,7 @@ namespace Medical_Information_System_API.Models
     {
         [AllowNull]
         [StringLength(5000, MinimumLength = 1, ErrorMessage = "Invalid anamnesis field length.")]
-        public string Anamnesis { get; set; }
+        public string? Anamnesis { get; set; }
         [Required]
         [StringLength(5000, MinimumLength = 1, ErrorMessage = "Invalid complaints field length.")]
         public string Complaints { get; set; }

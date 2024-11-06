@@ -30,6 +30,6 @@ namespace Medical_Information_System_API.Models
         [HasMainDiagnose(ErrorMessage = "Diagnoses must contain only 1 diagnose with Main type.")]
         public List<DiagnosisCreateModel> Diagnoses { get; set; }
         [AllowNull]
-        public List<ConsultationCreateModel> Consultations { get; set; }
+        public List<ConsultationCreateModel>? Consultations { get; set; }
     }
 }

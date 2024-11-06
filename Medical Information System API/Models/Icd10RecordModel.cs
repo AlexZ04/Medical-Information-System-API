@@ -8,9 +8,9 @@ namespace Medical_Information_System_API.Models
     public class Icd10RecordModel
     {
         [AllowNull]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         [AllowNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Required]
         public Guid Id { get; set; }
         [Required]

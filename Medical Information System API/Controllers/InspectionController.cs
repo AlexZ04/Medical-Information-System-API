@@ -128,7 +128,7 @@ namespace Medical_Information_System_API.Controllers
                         ));
                     currentId = nextInsp.Id;
                 }
-                
+
             }
 
             return Ok(chain);
