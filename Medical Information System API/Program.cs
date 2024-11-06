@@ -99,7 +99,7 @@ if (builder.Configuration["EnterSpecialities"] == "1" && context != null)
 {
     foreach (var table in dependentTables)
     {
-        context.Database.ExecuteSql($"DELETE FROM {table}");
+        context.Database.ExecuteSqlRaw($"DELETE FROM {table}");
     }
     
     context.Database.ExecuteSqlRaw("DELETE FROM speciality");
@@ -113,7 +113,7 @@ if (builder.Configuration["EnterIcdData"] == "1" && context != null)
 {
     foreach (var table in dependentTables)
     {
-        context.Database.ExecuteSql($"DELETE FROM {table}");
+        context.Database.ExecuteSqlRaw($"DELETE FROM {table}");
     }
 
     context.Database.ExecuteSqlRaw("DELETE FROM icd10");

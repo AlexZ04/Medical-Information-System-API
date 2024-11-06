@@ -216,7 +216,7 @@ namespace Medical_Information_System_API.Controllers
                 .Where(x => x.Patient.Id == id);
 
             if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id) &&
-            d.Type == DiagnosisType.Main && d.Record.ParentId == Guid.Empty));
+            d.Type == DiagnosisType.Main && d.Record.ParentId == null));
 
             if (grouped)
             {

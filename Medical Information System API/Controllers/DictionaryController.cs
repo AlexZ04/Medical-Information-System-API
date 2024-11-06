@@ -67,7 +67,7 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {
-            var roots = await _context.Icd10.Where(x => x.ParentId == Guid.Empty).OrderBy(x => x.Code).ToListAsync();
+            var roots = await _context.Icd10.Where(x => x.ParentId == null).OrderBy(x => x.Code).ToListAsync();
 
             var res = new List<Icd10RecordModel>();
             foreach (var root in roots)
