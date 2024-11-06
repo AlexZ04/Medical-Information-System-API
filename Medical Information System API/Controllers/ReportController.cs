@@ -23,13 +23,14 @@ namespace Medical_Information_System_API.Controllers
             _logger = logger;
         }
 
+
         /// <summary>
         /// Get a report on patients visits based on ICD-10 roots for a specified time interval
         /// </summary>
         /// <response code="200">Report extracted successfully</response>
         /// <response code="400">Some fields in request are invalid</response>
         /// <response code="401">Unauthorized</response>
-        /// <response code="500">Server error</response>
+        /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(typeof(IcdRootsReportModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
@@ -44,6 +45,7 @@ namespace Medical_Information_System_API.Controllers
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
 
             List<string> icdRootsCodes = new List<string>();
 
@@ -61,6 +63,7 @@ namespace Medical_Information_System_API.Controllers
                 }
             }
 
+
             Dictionary<string, int> rootsVisiting = new Dictionary<string, int>();
             Dictionary<string, int> dictSample = new Dictionary<string, int>();
 
@@ -69,6 +72,7 @@ namespace Medical_Information_System_API.Controllers
                 rootsVisiting.Add(icdRootCode, 0);
                 dictSample.Add(icdRootCode, 0);
             }
+
 
             var records = new List<IcdRootsReportRecordModel>();
             var filters = new IcdRootsReportFiltersModel(start, end, icdRootsCodes);
@@ -81,6 +85,7 @@ namespace Medical_Information_System_API.Controllers
                 .OrderBy(i => i.Patient.Name)
                 .Where(i => i.Date >= start && i.Date <= end).ToListAsync();
 
+
             foreach (var insp in inspList) { 
                 if (!usedPatients.Contains(insp.Patient.Id))
                 {
@@ -92,6 +97,7 @@ namespace Medical_Information_System_API.Controllers
                 var diagnose = insp.Diagnoses.Where(d => d.Type == DiagnosisType.Main).SingleOrDefault();
 
                 if (diagnose == null) return BadRequest();
+
 
                 try
                 {
@@ -108,6 +114,7 @@ namespace Medical_Information_System_API.Controllers
                     _logger.LogError(ex.ToString());
                 }
             }
+
 
             var result = new IcdRootsReportModel(filters, records, rootsVisiting);
 

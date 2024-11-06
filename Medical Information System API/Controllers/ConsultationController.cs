@@ -28,7 +28,7 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="400">Invalid arguments for filtration/pagination</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Not found</response>
-        /// <response code="500">InternalServerError</response>
+        /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(typeof(InspectionPagedListModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
@@ -124,7 +124,7 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="200">Success</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Consultation or parent comment not found</response>
-        /// <response code="500">InternalServerError</response>
+        /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(typeof(ConsultationModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
@@ -159,7 +159,7 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="404">Not found</response>
         /// <response code="406">User doesn't have add comment to consultation 
         /// (unsuitable specialty and not the inspection author)</response>
-        /// <response code="500">InternalServerError</response>
+        /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(typeof(GuidResponseModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
@@ -210,7 +210,7 @@ namespace Medical_Information_System_API.Controllers
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Comment not found</response>
         /// <response code="406">User is not the author of the comment</response>
-        /// <response code="500">InternalServerError</response>
+        /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
