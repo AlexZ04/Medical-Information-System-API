@@ -153,8 +153,8 @@ namespace Medical_Information_System_API.Controllers
         /// </summary>
         /// <response code="200">Doctor was loginned</response>
         /// <response code="400">Bad request</response>
-        /// <response code="401">Invalid arguments</response>
-        /// <response code="404">Invalid arguments</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Not found</response>
         /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]

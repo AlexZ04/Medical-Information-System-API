@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Medical_Information_System_API.Controllers
 {
@@ -19,9 +20,18 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+
         /// <summary>
         /// Get full info about specified inspection
         /// </summary>
+        /// <response code="200">Inspection found and successfully extracted</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(InspectionModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetInspectionInfo(Guid id)
@@ -37,19 +47,34 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Consultations).ThenInclude(c => c.Speciality)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (insp == null) return BadRequest();
+            if (insp == null) return NotFound();
 
             var res = new InspectionModel(insp);
             return Ok(res);
         }
 
+
         /// <summary>
         /// Edit concrete inspection
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="403">User doesn't have editing rights (not the inspection author)</response>
+        /// <response code="404">Inspection not found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> EditInspection(Guid id, [FromBody] InspectionEditModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
@@ -61,7 +86,14 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Consultations).ThenInclude(c => c.Speciality)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (insp == null) return BadRequest();
+            if (insp == null) return NotFound();
+
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            if (insp.Doctor.Id != new Guid(userId)) return Forbid(new ResponseModel("Error",
+                "User is not the inspection creator").ToString());
 
             var patient = insp.Patient;
 
@@ -76,10 +108,12 @@ namespace Medical_Information_System_API.Controllers
 
             List<Diagnose> newDiagnoses = new List<Diagnose>();
 
+
             foreach (var diagnose in insp.Diagnoses)
             {
                 _context.Diagnoses.Remove(diagnose);
             }
+
 
             foreach (var diagnose in diagnoses)
             {
@@ -93,6 +127,7 @@ namespace Medical_Information_System_API.Controllers
                 _context.Diagnoses.Add(createdDiagnose);
             }
 
+
             insp.Diagnoses = newDiagnoses;
 
             if (patient.LastInspectionDate == null || insp.Date >= patient.LastInspectionDate)
@@ -103,12 +138,23 @@ namespace Medical_Information_System_API.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new ResponseModel("Success", "Inspection successfully updated"));
         }
+
 
         /// <summary>
         /// Get medical inspection chain for root inspection
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Bad Request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(List<InspectionPreviewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}/chain")]
         [Authorize]
         public async Task<IActionResult> GetChain(Guid id)
@@ -123,7 +169,8 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (insp == null || insp.PreviousInspectionId != null) return BadRequest();
+            if (insp == null) return NotFound();
+            if (insp.PreviousInspectionId != null) return BadRequest();
 
             List<InspectionPreviewModel> chain = new List<InspectionPreviewModel>();
             bool flag = true;

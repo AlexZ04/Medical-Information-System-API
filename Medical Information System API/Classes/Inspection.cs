@@ -10,7 +10,7 @@ namespace Medical_Information_System_API.Classes
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime Date { get; set; }
-        public string Anamnesis { get; set; }
+        public string? Anamnesis { get; set; }
         public string Complaints { get; set; }
         public string Treatment { get; set; }
         public Conclusion Conclusion { get; set; }
