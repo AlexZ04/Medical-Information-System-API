@@ -66,8 +66,9 @@ namespace Medical_Information_System_API.Controllers
             List<Guid> usedPatients = new List<Guid>();
 
             var inspList = await _context.Inspections
-                .Include(x => x.Patient).Include(x => x.Doctor)
-                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                .Include(i => i.Patient).Include(i => i.Doctor)
+                .Include(i => i.Diagnoses).ThenInclude(d => d.Record)
+                .OrderBy(i => i.Patient.Name)
                 .Where(i => i.Date >= start && i.Date <= end).ToListAsync();
 
             foreach (var insp in inspList) { 

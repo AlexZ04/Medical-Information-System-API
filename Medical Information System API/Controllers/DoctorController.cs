@@ -139,7 +139,7 @@ namespace Medical_Information_System_API.Controllers
             loginnedDoctor.Gender = newDoctor.Gender;
             loginnedDoctor.Phone = newDoctor.Phone;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             loginnedDoctor.Password = "";
 

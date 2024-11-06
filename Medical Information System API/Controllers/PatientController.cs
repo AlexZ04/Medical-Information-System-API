@@ -227,6 +227,8 @@ namespace Medical_Information_System_API.Controllers
 
             await _context.SaveChangesAsync();
 
+            loginnedDoctor.Password = "";
+
             return Ok(new GuidResponseModel() { Id = inspectionId });
         }
 

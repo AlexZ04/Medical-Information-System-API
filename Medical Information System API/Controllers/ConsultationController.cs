@@ -37,6 +37,8 @@ namespace Medical_Information_System_API.Controllers
 
             if (loginnedDoctor == null) return Unauthorized();
 
+            loginnedDoctor.Password = "";
+
             var inspList = _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
@@ -130,6 +132,8 @@ namespace Medical_Information_System_API.Controllers
             _context.Comments.Add(createComment);
             await _context.SaveChangesAsync();
 
+            loginnedDoctor.Password = "";
+
             return Ok();
         }
 
@@ -157,6 +161,8 @@ namespace Medical_Information_System_API.Controllers
 
             comment.Content = newComment.Context;
             await _context.SaveChangesAsync();
+
+            loginnedDoctor.Password = "";
 
             return Ok();
         }
