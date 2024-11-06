@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Cryptography.Xml;
 
@@ -23,9 +24,18 @@ namespace Medical_Information_System_API.Controllers
             _logger = logger;
         }
 
+
         /// <summary>
         /// Create new patient
         /// </summary>
+        /// <response code="200">Patient was registered</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(GuidResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreatePatient([FromBody] PatientCreateModel patientCreateModel)
@@ -34,21 +44,27 @@ namespace Medical_Information_System_API.Controllers
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
 
             var patient = new Patient(patientCreateModel);
             _context.Patients.Add(patient);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new GuidResponseModel { Id = patient.Id });
         }
+
 
         /// <summary>
         /// Get patient list
         /// </summary>
+        /// <response code="200">Patients paged list retrieved</response>
+        /// <response code="400">Invalid arguments for filtration/pagination/sorting</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(PatientPagedListModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetPatientList([FromQuery] string? name, [FromQuery] List<Conclusion?> conslusion,
@@ -60,12 +76,15 @@ namespace Medical_Information_System_API.Controllers
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
 
+            if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
+
             if (name == null) name = "";
 
             var patientList = _context.Patients
                 .Where(p => p.Name.Contains(name));
 
             patientList = patientList.Where(p => p.Name.ToLower().Contains(name.ToLower()));
+
 
             if (onlyMine) {
                 if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null) return Unauthorized();
@@ -80,6 +99,7 @@ namespace Medical_Information_System_API.Controllers
                 patientList = patientList.Where(p => patientsId.Contains(p.Id));
             }
 
+
             if (scheduledVisits)
             {
                 var patientsId = await _context.Inspections
@@ -89,10 +109,12 @@ namespace Medical_Information_System_API.Controllers
                 patientList = patientList.Where(p => patientsId.Contains(p.Id));
             }
 
+
             if (conslusion != null && conslusion.Count > 0)
             {
                 patientList = patientList.Where(p => conslusion.Contains(p.HealthStatus));
             }
+
 
             switch (sorting)
             {
@@ -121,6 +143,7 @@ namespace Medical_Information_System_API.Controllers
                     break;
             }
 
+
             patientList = patientList.Skip((page - 1) * size).Take(size);
 
             int amount = await patientList.CountAsync();
@@ -128,21 +151,36 @@ namespace Medical_Information_System_API.Controllers
 
             var resList = new List<PatientModel>();
 
+
             foreach (var patient in patientRes)
             {
                 resList.Add(new PatientModel(patient));
             }
 
+
             var count = (int)Math.Ceiling(amount * 1.0 / size);
+
+            if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
 
             var resModel = new PatientPagedListModel(resList, new PageInfoModel(size, count, page));
 
             return Ok(resModel);
         }
 
+
         /// <summary>
         /// Create inspection for specified patient
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Patient not found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(GuidResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPost("{id}/inspections")]
         [Authorize]
         public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspection)
@@ -155,11 +193,12 @@ namespace Medical_Information_System_API.Controllers
 
             var patient = await _context.Patients.FindAsync(id);
 
-            if (patient == null) return BadRequest();
+            if (patient == null) return NotFound();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
             if (loginnedDoctor == null) return Unauthorized();
+
 
             List<Diagnose> diagnosesList = new List<Diagnose>();
 
@@ -174,6 +213,7 @@ namespace Medical_Information_System_API.Controllers
                 diagnosesList.Add(createdDiagnose);
                 _context.Diagnoses.Add(createdDiagnose);
             }
+
 
             List<Consultation> consultationList = new List<Consultation>();
 
@@ -196,6 +236,7 @@ namespace Medical_Information_System_API.Controllers
                 _context.Consultations.Add(createdConsultation);
             }
 
+
             int groupNumber = 0;
             if (inspection.PreviousInspectionId != null)
             {
@@ -215,6 +256,7 @@ namespace Medical_Information_System_API.Controllers
                 }  
             }
 
+
             var createdInspection = new Inspection(inspection, patient, loginnedDoctor, diagnosesList, consultationList,
                 inspectionId, groupNumber);
             _context.Inspections.Add(createdInspection);
@@ -232,9 +274,20 @@ namespace Medical_Information_System_API.Controllers
             return Ok(new GuidResponseModel() { Id = inspectionId });
         }
 
+
         /// <summary>
         /// Get a list of patient medical inspections
         /// </summary>
+        /// <response code="200">Patients inspections list retrieved</response>
+        /// <response code="400">Invalid arguments for filtration/pagination</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Patient not found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(InspectionPagedListModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}/inspections")]
         [Authorize]
         public async Task<IActionResult> GetInspectionsList(Guid id,
@@ -245,6 +298,8 @@ namespace Medical_Information_System_API.Controllers
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
 
+            if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
+
             var inspFromContext = _context.Inspections
                 .Include(x => x.Patient)
                 .Include(x => x.Doctor)
@@ -254,15 +309,18 @@ namespace Medical_Information_System_API.Controllers
                     .ThenInclude(c => c.Comments)
                 .Where(x => x.Patient.Id == id);
 
+
             if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => 
             icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
             d.Type == DiagnosisType.Main && d.Record.ParentId == null));
+
 
             if (grouped)
             {
                 inspFromContext = inspFromContext.
                     OrderBy(x => x.Group).ThenBy(x => x.CreateTime);
             }
+
 
             inspFromContext = inspFromContext
                 .Skip((page - 1) * size).Take(size);
@@ -292,17 +350,29 @@ namespace Medical_Information_System_API.Controllers
                 list.Add(previewModel);
             }
 
+
             var amount = await _context.Inspections.CountAsync();
             var count = (int)Math.Ceiling(amount * 1.0 / size);
+
+            if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
 
             var res = new InspectionPagedListModel(list, new PageInfoModel(size, count, page));
 
             return Ok(res);
         }
 
+
         /// <summary>
         /// Get patient card
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Patient not found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(PatientModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetPatientCard(Guid id)
@@ -316,9 +386,18 @@ namespace Medical_Information_System_API.Controllers
             return patient != null ? Ok(new PatientModel(patient)) : NotFound();
         }
 
+
         /// <summary>
         /// Search for patient medical inspections without child inspections
         /// </summary>
+        /// <response code="200">Patients inspections list retrieved</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Patient not found</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(List<InspectionShortModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}/inspection/search")]
         [Authorize]
         public async Task<IActionResult> SearchInspWithoutChild(Guid id, [FromQuery] string? request)
@@ -326,6 +405,9 @@ namespace Medical_Information_System_API.Controllers
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            var patient = _context.Patients.Find(id);
+            if (patient == null) return NotFound();
 
             List<InspectionShortModel> result = new List<InspectionShortModel>();
 
@@ -346,6 +428,7 @@ namespace Medical_Information_System_API.Controllers
                     x.Diagnoses.Any(d => d.Record.Name.ToLower().StartsWith(request) || d.Record.Code.ToLower().Contains(request)))
 
                 .ToListAsync();
+
 
             foreach (var inspection in inspections)
             {
