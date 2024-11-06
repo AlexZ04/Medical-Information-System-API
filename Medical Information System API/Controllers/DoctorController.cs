@@ -30,9 +30,16 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+
         /// <summary>
         /// Register new user (doctor)
         /// </summary>
+        /// <response code="200">Doctor was registered</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(TokenResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPost("register")]
         public async Task<IActionResult> PostRegister([FromBody] DoctorRegisterModel doctorDTO)
         {
@@ -40,11 +47,11 @@ namespace Medical_Information_System_API.Controllers
 
             var doctor = await _context.Doctors.FirstOrDefaultAsync(u => u.Email == doctorDTO.Email);
 
-            if (doctor != null) return BadRequest("This email is already used");
+            if (doctor != null) return BadRequest(new ResponseModel("Error", "This email is already used"));
 
             var foundSpec = await _context.SpecialitiesList.FirstOrDefaultAsync(u => u.Id == doctorDTO.Speciality);
 
-            if (foundSpec == null) return BadRequest();
+            if (foundSpec == null) return BadRequest(new ResponseModel("Error", "This speciality doesn't exits"));
 
             var newDoctor = new DoctorDatabase(doctorDTO);
             _context.Doctors.Add(newDoctor);
@@ -55,9 +62,16 @@ namespace Medical_Information_System_API.Controllers
             return Ok(new TokenResponseModel(token));
         }
 
+
         /// <summary>
         /// Log in to the system
         /// </summary>
+        /// <response code="200">Doctor was loginned</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(TokenResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPost("login")]
         public async Task<IActionResult> PostLogin([FromBody] LoginCredentialsModel loginData)
         {
@@ -67,7 +81,7 @@ namespace Medical_Information_System_API.Controllers
 
             if (foundUser == null || !Crypto.VerifyHashedPassword(foundUser.Password, loginData.Password))
             {
-                return BadRequest();
+                return BadRequest(new ResponseModel("Error", "Invalid account details"));
             }
 
             foundUser.Password = "";
@@ -77,9 +91,16 @@ namespace Medical_Information_System_API.Controllers
             return Ok(new TokenResponseModel(token));
         }
 
+
         /// <summary>
         /// Log out system user
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="401">Invalid arguments</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> PostLogout()
@@ -92,12 +113,21 @@ namespace Medical_Information_System_API.Controllers
             _context.BlacklistTokens.Add(tokenInBlacklist);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new ResponseModel("Success", "Doctor log outed from system"));
         }
+
 
         /// <summary>
         /// Get user profile
         /// </summary>
+        /// <response code="200">Doctor was loginned</response>
+        /// <response code="401">Invalid arguments</response>
+        /// <response code="404">Invalid arguments</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(DoctorModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("profile")]
         [Authorize]
         public async Task<IActionResult> GetProfile()
@@ -109,7 +139,7 @@ namespace Medical_Information_System_API.Controllers
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
-            if (loginnedDoctor == null) return Unauthorized();
+            if (loginnedDoctor == null) return NotFound();
 
             loginnedDoctor.Password = "";
             var doctor = new DoctorModel(loginnedDoctor);
@@ -117,13 +147,26 @@ namespace Medical_Information_System_API.Controllers
             return Ok(doctor);
         }
 
+
         /// <summary>
         /// Edit user profile
         /// </summary>
+        /// <response code="200">Doctor was loginned</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Invalid arguments</response>
+        /// <response code="404">Invalid arguments</response>
+        /// <response code="500">Internal Server Error</response>
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpPut("profile")]
         [Authorize]
         public async Task<IActionResult> EditProfile([FromBody] DoctorEditModel newDoctor)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
@@ -131,7 +174,7 @@ namespace Medical_Information_System_API.Controllers
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
-            if (loginnedDoctor == null) return Unauthorized();
+            if (loginnedDoctor == null) return NotFound();
 
             loginnedDoctor.Email = newDoctor.Email;
             loginnedDoctor.Name = newDoctor.Name;
@@ -143,7 +186,7 @@ namespace Medical_Information_System_API.Controllers
 
             loginnedDoctor.Password = "";
 
-            return Ok();
+            return Ok(new ResponseModel("Success", "Doctor successfully edited"));
         }
     }
 }

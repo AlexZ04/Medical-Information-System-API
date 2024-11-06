@@ -14,7 +14,7 @@ namespace Medical_Information_System_API.Classes
         public DateTime? Birthday { get; set; }
         public Gender Gender { get; set; }
         public string Email { get; set; }
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         public DateTime CreateTime { get; set; }
         public Guid Speciality { get; set; }
 
