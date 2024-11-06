@@ -95,6 +95,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> GetConcreteConsultation(Guid id)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             var cons = await _context.Consultations
                 .Include(c => c.Speciality)
                 .Include(c => c.Comments).ThenInclude(c => c.Author)

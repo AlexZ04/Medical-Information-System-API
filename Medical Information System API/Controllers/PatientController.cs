@@ -30,6 +30,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> CreatePatient([FromBody] PatientCreateModel patientCreateModel)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -52,6 +56,10 @@ namespace Medical_Information_System_API.Controllers
             [FromQuery] bool scheduledVisits = false, [FromQuery] bool onlyMine = false, 
             [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             if (name == null) name = "";
 
             var patientList = _context.Patients
@@ -139,14 +147,15 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspection)
         {
-            var patient = await _context.Patients.FindAsync(id);
-
-            if (patient == null) return BadRequest();
-
+           
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            var patient = await _context.Patients.FindAsync(id);
+
+            if (patient == null) return BadRequest();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
@@ -230,6 +239,10 @@ namespace Medical_Information_System_API.Controllers
             [FromQuery] List<Guid> icdRoots, [FromQuery] bool grouped = false,
             [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             var inspFromContext = _context.Inspections
                 .Include(x => x.Patient)
                 .Include(x => x.Doctor)
@@ -291,6 +304,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> GetPatientCard(Guid id)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             var patient = await _context.Patients.FindAsync(id);
 
             return patient != null ? Ok(new PatientModel(patient)) : NotFound();
@@ -303,6 +320,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> SearchInspWithoutChild(Guid id, [FromQuery] string? request)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             List<InspectionShortModel> result = new List<InspectionShortModel>();
 
             if (request == null) request = "";

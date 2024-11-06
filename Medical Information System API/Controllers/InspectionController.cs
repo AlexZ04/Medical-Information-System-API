@@ -1,6 +1,7 @@
 ﻿using Medical_Information_System_API.Classes;
 using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> GetInspectionInfo(Guid id)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             var insp = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
@@ -45,6 +50,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> EditInspection(Guid id, [FromBody] InspectionEditModel model)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             var insp = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
@@ -104,6 +113,10 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> GetChain(Guid id)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             var insp = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
                 .Include(x => x.Diagnoses).ThenInclude(d => d.Record)

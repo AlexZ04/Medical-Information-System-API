@@ -1,5 +1,6 @@
 ﻿using Medical_Information_System_API.Data;
 using Medical_Information_System_API.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,10 @@ namespace Medical_Information_System_API.Controllers
         public async Task<IActionResult> GetReport([FromQuery, Required] DateTime start, [FromQuery, Required] DateTime end,
             [FromQuery] List<Guid> icdRoots)
         {
+            var token = HttpContext.GetTokenAsync("access_token").Result;
+
+            if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
             List<string> icdRootsCodes = new List<string>();
 
             if (icdRoots.Count() == 0)
