@@ -57,6 +57,12 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(pathXml);
 });
 
+builder.Services.AddMvc(options =>
+{
+    options.ReturnHttpNotAcceptable = true;
+}
+);
+
 var db = new DatabaseManager();
 db.CreateDatabase("mis_db");
 

@@ -20,11 +20,22 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+
         /// <summary>
         /// Get a list of medical inspections for consultation
         /// </summary>
+        /// <response code="200">Inspections for consultation list retrieved</response>
+        /// <response code="400">Invalid arguments for filtration/pagination</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Not found</response>
+        /// <response code="500">InternalServerError</response>
         [HttpGet]
         [Authorize]
+        [ProducesResponseType(typeof(InspectionPagedListModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetInspections([FromQuery] bool grouped, [FromQuery] List<Guid> icdRoots,
             [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
@@ -35,9 +46,18 @@ namespace Medical_Information_System_API.Controllers
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
-            if (loginnedDoctor == null) return Unauthorized();
+            if (loginnedDoctor == null) return NotFound();
+
+            if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
 
             loginnedDoctor.Password = "";
+
+            foreach (var icdRoot in icdRoots)
+            {
+                var foundRoot = _context.Icd10.Find(icdRoot);
+                if (foundRoot == null || foundRoot.ParentId != null) return BadRequest(new ResponseModel("Error", "Invalid ICd-10 roots"));
+            }
+
 
             var inspList = _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
@@ -49,17 +69,20 @@ namespace Medical_Information_System_API.Controllers
             icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
             d.Type == DiagnosisType.Main && d.Record.ParentId == null));
 
+
             if (grouped)
             {
                 inspList = inspList.
                     OrderBy(x => x.Group).ThenBy(x => x.CreateTime);
             }
 
+
             inspList = inspList.Skip((page - 1) * size).Take(size);
             var inspections = await inspList.ToListAsync();
 
             List<InspectionPreviewModel> list = new List<InspectionPreviewModel>();
             bool hasChain = false, hasNested = false;
+
 
             foreach (var inspection in inspections)
             {
@@ -83,19 +106,33 @@ namespace Medical_Information_System_API.Controllers
                 list.Add(previewModel);
             }
 
+
             var amount = await _context.Inspections.CountAsync();
             var count = (int)Math.Ceiling(amount * 1.0 / size);
+
+            if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
 
             var res = new InspectionPagedListModel(list, new PageInfoModel(size, count, page));
 
             return Ok(res);
         }
 
+
         /// <summary>
         /// Get concrete consultation
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Consultation or parent comment not found</response>
+        /// <response code="500">InternalServerError</response>
         [HttpGet("{id}")]
         [Authorize]
+        [ProducesResponseType(typeof(ConsultationModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetConcreteConsultation(Guid id)
         {
             var token = HttpContext.GetTokenAsync("access_token").Result;
@@ -106,18 +143,35 @@ namespace Medical_Information_System_API.Controllers
                 .Include(c => c.Speciality)
                 .Include(c => c.Comments).ThenInclude(c => c.Author)
                 .FirstOrDefaultAsync(x => x.Id == id);
-            if (cons == null) return BadRequest();
+
+            if (cons == null) return NotFound();
 
             return Ok(new ConsultationModel(cons));
         }
 
+
         /// <summary>
         /// Add comment to concrete consultation
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Not found</response>
+        /// <response code="406">User doesn't have add comment to consultation 
+        /// (unsuitable specialty and not the inspection author)</response>
+        /// <response code="500">InternalServerError</response>
         [HttpPost("{id}/comment")]
         [Authorize]
+        [ProducesResponseType(typeof(GuidResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddComment(Guid id, [FromBody] CommentCreateModel comment)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
@@ -125,7 +179,17 @@ namespace Medical_Information_System_API.Controllers
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
-            if (loginnedDoctor == null) return Unauthorized();
+            if (loginnedDoctor == null) return NotFound();
+
+            var consultation = _context.Consultations
+                .Include(c => c.Comments)
+                .Include(c => c.Speciality)
+                .FirstOrDefault(c => c.Id == id);
+
+            if (consultation == null) return NotFound();
+
+            if (consultation.Speciality.Id != loginnedDoctor.Speciality &&
+                consultation.AuthorId != new Guid(userId)) return StatusCode(StatusCodes.Status406NotAcceptable);
 
             var createComment = new Comment(comment, loginnedDoctor);
 
@@ -134,16 +198,25 @@ namespace Medical_Information_System_API.Controllers
 
             loginnedDoctor.Password = "";
 
-            return Ok();
+            return Ok(new GuidResponseModel { Id = createComment.Id });
         }
+
 
         /// <summary>
         /// Edit comment
         /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid arguments</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Comment not found</response>
+        /// <response code="406">User is not the author of the comment</response>
+        /// <response code="500">InternalServerError</response>
         [HttpPut("comment/{id}")]
         [Authorize]
         public async Task<IActionResult> EditComment(Guid id, [FromBody] InspectionCommentCreateModel newComment)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
@@ -153,18 +226,20 @@ namespace Medical_Information_System_API.Controllers
 
             if (loginnedDoctor == null) return Unauthorized();
 
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _context.Comments
+                .Include(c => c.Author)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (comment == null) return BadRequest();
+            if (comment == null) return NotFound(new ResponseModel("Error", "Comment not found"));
 
-            if (comment.Author.Id != new Guid(userId)) return Forbid();
+            if (comment.Author.Id != new Guid(userId)) return StatusCode(StatusCodes.Status406NotAcceptable);
 
             comment.Content = newComment.Context;
             await _context.SaveChangesAsync();
 
             loginnedDoctor.Password = "";
 
-            return Ok();
+            return Ok(new ResponseModel("Success", "Comment edited"));
         }
     }
 }

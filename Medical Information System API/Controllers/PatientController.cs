@@ -190,7 +190,7 @@ namespace Medical_Information_System_API.Controllers
 
                 _context.Comments.Add(createComment);
 
-                var createdConsultation = new Consultation(speciality, inspectionId, createComment);
+                var createdConsultation = new Consultation(speciality, inspectionId, createComment, loginnedDoctor.Id);
 
                 consultationList.Add(createdConsultation);
                 _context.Consultations.Add(createdConsultation);
