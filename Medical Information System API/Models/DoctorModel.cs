@@ -23,6 +23,7 @@ namespace Medical_Information_System_API.Models
         public string Email { get; set; }
         [AllowNull]
         [Phone]
+        [RegularExpression("^\\+7.\\(\\d{3}\\).\\d{3}-\\d{2}-\\d{2}$", ErrorMessage = "Phone field must match mask: +7 (xxx) xxx-xx-xx")]
         public string? Phone { get; set; }
 
         public DoctorModel(DoctorDatabase model)

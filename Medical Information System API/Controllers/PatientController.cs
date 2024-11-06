@@ -252,7 +252,8 @@ namespace Medical_Information_System_API.Controllers
                     .ThenInclude(c => c.Comments)
                 .Where(x => x.Patient.Id == id);
 
-            if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id) &&
+            if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => 
+            icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
             d.Type == DiagnosisType.Main && d.Record.ParentId == null));
 
             if (grouped)

@@ -43,7 +43,8 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
                 .Where(x => x.Doctor.Speciality == loginnedDoctor.Speciality);
 
-            if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d => icdRoots.Contains(d.Record.Id) &&
+            if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d => 
+            icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
             d.Type == DiagnosisType.Main && d.Record.ParentId == null));
 
             if (grouped)

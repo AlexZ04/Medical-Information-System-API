@@ -84,7 +84,7 @@ namespace Medical_Information_System_API.Controllers
 
                 try
                 {
-                    string rootCode = _context.GetIcdParentCode(diagnose.Record.Id);
+                    string rootCode = _context.GetIcdParent(diagnose.Record.Id).Code;
 
                     if (rootCode != null && icdRootsCodes.Contains(rootCode))
                     {

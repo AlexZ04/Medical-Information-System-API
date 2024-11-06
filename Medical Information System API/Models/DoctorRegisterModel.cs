@@ -20,8 +20,9 @@ namespace Medical_Information_System_API.Models
         public DateTime? Birthday { get; set; }
         [Required]
         public Gender Gender { get; set; }
-        [Phone]
         [AllowNull]
+        [Phone]
+        [RegularExpression("^\\+7.\\(\\d{3}\\).\\d{3}-\\d{2}-\\d{2}$", ErrorMessage = "Phone field must match mask: +7 (xxx) xxx-xx-xx")]
         public string? Phone { get; set; }
         [Required]
         public Guid Speciality { get; set; }

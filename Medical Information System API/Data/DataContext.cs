@@ -60,7 +60,7 @@ namespace Medical_Information_System_API.Data
             return BlacklistTokens.Find(token) == null ? true : false;
         }
 
-        public string GetIcdParentCode(Guid id)
+        public Icd10Record GetIcdParent(Guid id)
         {
             var record = Icd10.Find(id);
             
@@ -73,7 +73,7 @@ namespace Medical_Information_System_API.Data
 
             if (record == null) throw new Exception("Error with founding parent ID...");
 
-            return record.Code;
+            return record;
         }
 
     }
