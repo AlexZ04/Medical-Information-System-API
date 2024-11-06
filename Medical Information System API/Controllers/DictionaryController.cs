@@ -22,6 +22,9 @@ namespace Medical_Information_System_API.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Get spetialities list
+        /// </summary>
         [HttpGet("speciality")]
         public async Task<IActionResult> GetSpecialities([FromQuery] string? name, [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
@@ -38,6 +41,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(answer);
         }
 
+        /// <summary>
+        /// Search for diagnoses in ICD-10 dictionary
+        /// </summary>
         [HttpGet("icd10")]
         public async Task<IActionResult> GetDiagnoses([FromQuery] string? request, [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
@@ -64,6 +70,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(answer);
         }
 
+        /// <summary>
+        /// Get root ICD-10 elements
+        /// </summary>
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {

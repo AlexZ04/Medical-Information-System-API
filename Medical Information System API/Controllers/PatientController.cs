@@ -23,6 +23,9 @@ namespace Medical_Information_System_API.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Create new patient
+        /// </summary>
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreatePatient([FromBody] PatientCreateModel patientCreateModel)
@@ -39,6 +42,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Get patient list
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetPatientList([FromQuery] string? name, [FromQuery] List<Conclusion?> conslusion,
@@ -126,6 +132,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(resModel);
         }
 
+        /// <summary>
+        /// Create inspection for specified patient
+        /// </summary>
         [HttpPost("{id}/inspections")]
         [Authorize]
         public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspection)
@@ -200,6 +209,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(inspectionId);
         }
 
+        /// <summary>
+        /// Get a list of patient medical inspections
+        /// </summary>
         [HttpGet("{id}/inspections")]
         [Authorize]
         public async Task<IActionResult> GetInspectionsList(Guid id,
@@ -220,8 +232,6 @@ namespace Medical_Information_System_API.Controllers
 
             if (grouped)
             {
-                // фильтрация по критерию “Сгруппировать по повторным” -
-                // при выборе данного критерия осмотры группируются в цепочки взаимосвязанных осмотров
                 inspFromContext = inspFromContext.
                     OrderBy(x => x.Group).ThenBy(x => x.CreateTime);
             }
@@ -262,6 +272,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Get patient card
+        /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetPatientCard(Guid id)
@@ -271,6 +284,9 @@ namespace Medical_Information_System_API.Controllers
             return patient != null ? Ok(new PatientModel(patient)) : NotFound();
         }
 
+        /// <summary>
+        /// Search for patient medical inspections without child inspections
+        /// </summary>
         [HttpGet("{id}/inspection/search")]
         [Authorize]
         public async Task<IActionResult> SearchInspWithoutChild(Guid id, [FromQuery] string? request)

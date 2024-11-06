@@ -18,6 +18,9 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Get full info about specified inspection
+        /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetInspectionInfo(Guid id)
@@ -35,6 +38,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Edit concrete inspection
+        /// </summary>
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> EditInspection(Guid id, [FromBody] InspectionEditModel model)
@@ -83,6 +89,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Get medical inspection chain for root inspection
+        /// </summary>
         [HttpGet("{id}/chain")]
         [Authorize]
         public async Task<IActionResult> GetChain(Guid id)

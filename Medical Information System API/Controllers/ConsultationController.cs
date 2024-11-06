@@ -20,6 +20,9 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Get a list of medical inspections for consultation
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetInspections([FromQuery] bool grouped, [FromQuery] List<Guid> icdRoots,
@@ -85,6 +88,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Get concrete consultation
+        /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetConcreteConsultation(Guid id)
@@ -98,6 +104,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(new ConsultationModel(cons));
         }
 
+        /// <summary>
+        /// Add comment to concrete consultation
+        /// </summary>
         [HttpPost("{id}/comment")]
         [Authorize]
         public async Task<IActionResult> AddComment(Guid id, [FromBody] CommentCreateModel comment)
@@ -119,6 +128,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Edit comment
+        /// </summary>
         [HttpPut("comment/{id}")]
         [Authorize]
         public async Task<IActionResult> EditComment(Guid id, [FromBody] InspectionCommentCreateModel newComment)

@@ -30,6 +30,9 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Register new user (doctor)
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> PostRegister([FromBody] DoctorRegisterModel doctorDTO)
         {
@@ -52,6 +55,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(new TokenResponseModel(token));
         }
 
+        /// <summary>
+        /// Log in to the system
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> PostLogin([FromBody] LoginCredentialsModel loginData)
         {
@@ -71,6 +77,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(new TokenResponseModel(token));
         }
 
+        /// <summary>
+        /// Log out system user
+        /// </summary>
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> PostLogout()
@@ -86,6 +95,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Get user profile
+        /// </summary>
         [HttpGet("profile")]
         [Authorize]
         public async Task<IActionResult> GetProfile()
@@ -105,6 +117,9 @@ namespace Medical_Information_System_API.Controllers
             return Ok(doctor);
         }
 
+        /// <summary>
+        /// Edit user profile
+        /// </summary>
         [HttpPut("profile")]
         [Authorize]
         public async Task<IActionResult> EditProfile([FromBody] DoctorEditModel newDoctor)

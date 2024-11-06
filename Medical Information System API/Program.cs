@@ -52,6 +52,9 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+
+    var pathXml = Path.Combine(AppContext.BaseDirectory, "api.xml");
+    options.IncludeXmlComments(pathXml);
 });
 
 var db = new DatabaseManager();

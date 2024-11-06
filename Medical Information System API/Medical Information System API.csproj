@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Medical_Information_System_API</RootNamespace>
+	  <DocumentationFile>bin\Debug\api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

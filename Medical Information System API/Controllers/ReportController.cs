@@ -20,8 +20,11 @@ namespace Medical_Information_System_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Get a report on patients visits based on ICD-10 roots for a specified time interval
+        /// </summary>
         [HttpGet("icdrootsreport")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetReport([FromQuery, Required] DateTime start, [FromQuery, Required] DateTime end,
             [FromQuery] List<Guid> icdRoots)
         {
@@ -42,16 +45,43 @@ namespace Medical_Information_System_API.Controllers
             }
 
             Dictionary<string, int> rootsVisiting = new Dictionary<string, int>();
+            Dictionary<string, int> dictSample = new Dictionary<string, int>();
 
             foreach (var icdRootCode in icdRootsCodes)
             {
                 rootsVisiting.Add(icdRootCode, 0);
+                dictSample.Add(icdRootCode, 0);
             }
 
             var records = new List<IcdRootsReportRecordModel>();
             var filters = new IcdRootsReportFiltersModel(start, end, icdRootsCodes);
 
-            var recordsList = _context.Inspections.Where(i => i.Date >= start && i.Date <= end);
+            List<Guid> usedPatients = new List<Guid>();
+
+            var inspList = await _context.Inspections
+                .Include(x => x.Patient).Include(x => x.Doctor)
+                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
+                .Where(i => i.Date >= start && i.Date <= end).ToListAsync();
+
+            foreach (var insp in inspList) { 
+                if (!usedPatients.Contains(insp.Patient.Id))
+                {
+                    usedPatients.Add(insp.Patient.Id);
+                    records.Add(new IcdRootsReportRecordModel(insp.Patient.Name, insp.Patient.Birthday, insp.Patient.Gender,
+                        dictSample.ToDictionary(entry => entry.Key, entry => entry.Value)));
+                }
+
+                foreach (var diagnose in insp.Diagnoses)
+                {
+                    string rootCode = _context.GetIcdParentCode(diagnose.Id);
+
+                    if (rootCode != null && icdRootsCodes.Contains(rootCode))
+                    {
+                        records[usedPatients.IndexOf(insp.Patient.Id)].VisitByRoot[rootCode]++;
+                        rootsVisiting[rootCode]++;
+                    }
+                }
+            }
 
             var result = new IcdRootsReportModel(filters, records, rootsVisiting);
 

@@ -60,5 +60,21 @@ namespace Medical_Information_System_API.Data
             return BlacklistTokens.Find(token) == null ? true : false;
         }
 
+        public string GetIcdParentCode(Guid id)
+        {
+            var record = Icd10.Find(id);
+            
+            if (record == null) return "";
+
+            while (record?.ParentId != null)
+            {
+                record = Icd10.Find(record.ParentId);
+            }
+
+            if (record == null) return "";
+
+            return record.Code;
+        }
+
     }
 }
