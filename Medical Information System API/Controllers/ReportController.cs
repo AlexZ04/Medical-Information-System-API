@@ -14,10 +14,12 @@ namespace Medical_Information_System_API.Controllers
     public class ReportController : Controller
     {
         private readonly DataContext _context;
+        private readonly ILogger<ReportController> _logger;
 
-        public ReportController(DataContext context)
+        public ReportController(DataContext context, ILogger<ReportController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>
@@ -71,7 +73,11 @@ namespace Medical_Information_System_API.Controllers
                         dictSample.ToDictionary(entry => entry.Key, entry => entry.Value)));
                 }
 
-                foreach (var diagnose in insp.Diagnoses)
+                var diagnose = insp.Diagnoses.Where(d => d.Type == DiagnosisType.Main).SingleOrDefault();
+
+                if (diagnose == null) return NotFound();
+
+                try
                 {
                     string rootCode = _context.GetIcdParentCode(diagnose.Record.Id);
 
@@ -80,6 +86,10 @@ namespace Medical_Information_System_API.Controllers
                         records[usedPatients.IndexOf(insp.Patient.Id)].VisitByRoot[rootCode]++;
                         rootsVisiting[rootCode]++;
                     }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
                 }
             }
 

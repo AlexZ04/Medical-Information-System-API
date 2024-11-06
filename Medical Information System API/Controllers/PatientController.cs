@@ -210,7 +210,7 @@ namespace Medical_Information_System_API.Controllers
                 inspectionId, groupNumber);
             _context.Inspections.Add(createdInspection);
 
-            if (patient.LastInspectionDate != null && createdInspection.Date > patient.LastInspectionDate)
+            if (patient.LastInspectionDate == null || createdInspection.Date > patient.LastInspectionDate)
             {
                 patient.LastInspectionDate = createdInspection.Date;
                 patient.HealthStatus = createdInspection.Conclusion;

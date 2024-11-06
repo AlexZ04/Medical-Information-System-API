@@ -53,6 +53,8 @@ namespace Medical_Information_System_API.Classes
             Conclusion = inspection.Conclusion;
             NextVisitDate = inspection.NextVisitDate;
             DeathDate = inspection.DeathDate;
+            BaseInspectionId = inspection.PreviousInspectionId;
+            PreviousInspectionId = inspection.PreviousInspectionId;
 
             Group = groupNumber;
         }

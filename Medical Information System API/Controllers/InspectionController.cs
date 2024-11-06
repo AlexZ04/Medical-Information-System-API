@@ -54,6 +54,8 @@ namespace Medical_Information_System_API.Controllers
 
             if (insp == null) return BadRequest();
 
+            var patient = insp.Patient;
+
             insp.Anamnesis = model.Anamnesis;
             insp.Complaints = model.Complaints;
             insp.Treatment = model.Treatment;
@@ -84,6 +86,12 @@ namespace Medical_Information_System_API.Controllers
 
             insp.Diagnoses = newDiagnoses;
 
+            if (patient.LastInspectionDate == null || insp.Date >= patient.LastInspectionDate)
+            {
+                patient.LastInspectionDate = insp.Date;
+                patient.HealthStatus = insp.Conclusion;
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok();
@@ -102,7 +110,7 @@ namespace Medical_Information_System_API.Controllers
                 .Include(x => x.Consultations).ThenInclude(c => c.Comments)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (insp == null) return BadRequest();
+            if (insp == null || insp.PreviousInspectionId != null) return BadRequest();
 
             List<InspectionPreviewModel> chain = new List<InspectionPreviewModel>();
             bool flag = true;
