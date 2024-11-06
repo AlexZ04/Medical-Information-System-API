@@ -57,7 +57,7 @@ namespace Medical_Information_System_API.Controllers
             var patientList = _context.Patients
                 .Where(p => p.Name.Contains(name));
 
-            patientList = patientList.Where(p => p.Name.Contains(name));
+            patientList = patientList.Where(p => p.Name.ToLower().Contains(name.ToLower()));
 
             if (onlyMine) {
                 if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null) return Unauthorized();
@@ -195,18 +195,30 @@ namespace Medical_Information_System_API.Controllers
             }
             else
             {
-                var lastAddedInsp = _context.Inspections.OrderByDescending(x => x.CreateTime).First();
-                if (lastAddedInsp != null) {
-                    groupNumber = lastAddedInsp.Group + 1;
-                }
+                if (_context.Inspections.Count() == 0) groupNumber = 0;
+                else
+                {
+                    var lastAddedInsp = _context.Inspections.OrderByDescending(x => x.CreateTime).First();
+                    if (lastAddedInsp != null)
+                    {
+                        groupNumber = lastAddedInsp.Group + 1;
+                    }
+                }  
             }
 
             var createdInspection = new Inspection(inspection, patient, loginnedDoctor, diagnosesList, consultationList,
                 inspectionId, groupNumber);
             _context.Inspections.Add(createdInspection);
+
+            if (patient.LastInspectionDate != null && createdInspection.Date > patient.LastInspectionDate)
+            {
+                patient.LastInspectionDate = createdInspection.Date;
+                patient.HealthStatus = createdInspection.Conclusion;
+            }
+
             await _context.SaveChangesAsync();
 
-            return Ok(inspectionId);
+            return Ok(new GuidResponseModel() { Id = inspectionId });
         }
 
         /// <summary>

@@ -73,7 +73,7 @@ namespace Medical_Information_System_API.Controllers
 
                 foreach (var diagnose in insp.Diagnoses)
                 {
-                    string rootCode = _context.GetIcdParentCode(diagnose.Id);
+                    string rootCode = _context.GetIcdParentCode(diagnose.Record.Id);
 
                     if (rootCode != null && icdRootsCodes.Contains(rootCode))
                     {
