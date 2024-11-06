@@ -26,11 +26,21 @@ namespace Medical_Information_System_API.Controllers
         /// <summary>
         /// Get a report on patients visits based on ICD-10 roots for a specified time interval
         /// </summary>
+        /// <response code="200">Report extracted successfully</response>
+        /// <response code="400">Some fields in request are invalid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Server error</response>
+        [ProducesResponseType(typeof(IcdRootsReportModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("icdrootsreport")]
         [Authorize]
         public async Task<IActionResult> GetReport([FromQuery, Required] DateTime start, [FromQuery, Required] DateTime end,
             [FromQuery] List<Guid> icdRoots)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
@@ -46,7 +56,7 @@ namespace Medical_Information_System_API.Controllers
                 foreach (var icdRootId in icdRoots)
                 {
                     var root = _context.Icd10.Find(icdRootId);
-                    if (root == null || root.ParentId != null) return BadRequest();
+                    if (root == null || root.ParentId != null) return BadRequest(new ResponseModel("Error", "Invalid ICD-10 roots"));
                     if (root != null) icdRootsCodes.Add(root.Code);
                 }
             }
@@ -81,7 +91,7 @@ namespace Medical_Information_System_API.Controllers
 
                 var diagnose = insp.Diagnoses.Where(d => d.Type == DiagnosisType.Main).SingleOrDefault();
 
-                if (diagnose == null) return NotFound();
+                if (diagnose == null) return BadRequest();
 
                 try
                 {
