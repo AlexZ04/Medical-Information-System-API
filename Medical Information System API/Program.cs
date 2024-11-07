@@ -11,6 +11,7 @@ using System.Reflection;
 using Medical_Information_System_API.Models;
 using Quartz;
 using Medical_Information_System_API.BackgroundProcesses;
+using Medical_Information_System_API.IcdTree;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -124,6 +125,9 @@ if (app.Environment.IsDevelopment())
 using var serviceScope = app.Services.CreateScope();
 var context = serviceScope.ServiceProvider.GetService<DataContext>();
 context?.Database.Migrate();
+
+var IcdManager = new IcdDataManager(context);
+await IcdManager.Init();
 
 List<string> dependentTables = new List<string>() { "diagnose", "comment", "consultation", "inspection" };
 

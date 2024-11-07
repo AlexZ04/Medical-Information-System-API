@@ -1,5 +1,6 @@
 ﻿using Medical_Information_System_API.Classes;
 using Medical_Information_System_API.Data;
+using Medical_Information_System_API.IcdTree;
 using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -112,12 +113,9 @@ namespace Medical_Information_System_API.Controllers
         [ProducesResponseType(typeof(List<Icd10RecordModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("icd-10/roots")]
-        public async Task<IActionResult> GetRootICDElements()
+        public IActionResult GetRootICDElements()
         {
-            var roots = await _context.Icd10
-                .Where(r => r.ParentId == null)
-                .OrderBy(r => r.Code)
-                .ToListAsync();
+            var roots = IcdDataManager.Roots.OrderBy(r => r.Code);
 
             var res = new List<Icd10RecordModel>();
             foreach (var root in roots)
