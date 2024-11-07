@@ -23,6 +23,9 @@ namespace Medical_Information_System_API.IcdTree
                 .ToListAsync();
 
             var icdData = await _context.Icd10.ToListAsync();
+
+            CodeTree.Build(icdData, true);
+            NameTree.Build(icdData);       
         }
     }
 }
