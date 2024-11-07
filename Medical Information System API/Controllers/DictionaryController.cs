@@ -71,7 +71,7 @@ namespace Medical_Information_System_API.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         [HttpGet("icd10")]
-        public async Task<IActionResult> GetDiagnoses([FromQuery] string? request, [FromQuery] int page = 1, [FromQuery] int size = 5)
+        public IActionResult GetDiagnoses([FromQuery] string? request, [FromQuery] int page = 1, [FromQuery] int size = 5)
         {
             if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
 

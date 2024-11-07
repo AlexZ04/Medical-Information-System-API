@@ -227,7 +227,7 @@ namespace Medical_Information_System_API.Controllers
 
             foreach (var diagnoseModel in inspection.Diagnoses)
             {
-                var Icd10Rec = await _context.Icd10.FindAsync(diagnoseModel.IcdDiagnosisId);
+                var Icd10Rec = _context.Icd10.Find(diagnoseModel.IcdDiagnosisId);
 
                 if (Icd10Rec == null) return BadRequest();
 

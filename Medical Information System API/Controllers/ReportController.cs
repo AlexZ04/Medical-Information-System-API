@@ -1,4 +1,5 @@
 ﻿using Medical_Information_System_API.Data;
+using Medical_Information_System_API.IcdTree;
 using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -51,9 +52,9 @@ namespace Medical_Information_System_API.Controllers
 
             if (icdRoots.Count() == 0)
             {
-                icdRootsCodes = await _context.Icd10.Where(r => r.ParentId == null)
+                icdRootsCodes = IcdDataManager.Roots
                     .OrderBy(r => r.Code)
-                    .Select(r => r.Code).ToListAsync();
+                    .Select(r => r.Code).ToList();
             }
             else
             {
