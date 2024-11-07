@@ -70,7 +70,7 @@ namespace Medical_Information_System_API.BackgroundProcesses
             foreach (var inspiredInsp in queueToSend)
             {
                 await SendEmail(inspiredInsp);
-                //inspiredInsp.SendedEmail = true;
+                inspiredInsp.SendedEmail = true;
                 await _dbContext.SaveChangesAsync();
             }
         }
@@ -90,7 +90,7 @@ namespace Medical_Information_System_API.BackgroundProcesses
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.UseDefaultCredentials = false;
             smtp.Timeout = 10000;
-            smtp.Credentials = new NetworkCredential(MailData.EMAIL, MailData.PASSWORD);
+            smtp.Credentials = new NetworkCredential(MailData.EMAIL, MailData.APP_PASSWORD);
 
             await smtp.SendMailAsync(message);
         }
