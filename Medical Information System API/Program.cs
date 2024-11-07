@@ -9,6 +9,8 @@ using Medical_Information_System_API.Classes;
 using System.Text.Json.Serialization;
 using System.Reflection;
 using Medical_Information_System_API.Models;
+using Quartz;
+using Medical_Information_System_API.BackgroundProcesses;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +84,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddQuartz(options =>
+{
+    var jobKey = new JobKey(nameof(ProccessClearBlacklistDb));
+
+    options
+        .AddJob<ProccessClearBlacklistDb>(jobKey)
+        .AddTrigger(
+            trigger => trigger.ForJob(jobKey).WithSimpleSchedule(
+                schedule => schedule.WithIntervalInHours(24).RepeatForever())
+            );
+
+});
+
+builder.Services.AddQuartzHostedService(options =>
+{
+    options.WaitForJobsToComplete = true;
+});
+
 
 var app = builder.Build();
 
