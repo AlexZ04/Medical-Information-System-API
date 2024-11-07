@@ -101,7 +101,7 @@ builder.Services.AddQuartz(options =>
         .AddJob<ProcessEmails>(jobKeyEmail)
         .AddTrigger(
             trigger => trigger.ForJob(jobKeyEmail).WithSimpleSchedule(
-                schedule => schedule.WithIntervalInMinutes(10).RepeatForever())
+                schedule => schedule.WithIntervalInSeconds(60).RepeatForever())
         );
 
 });
