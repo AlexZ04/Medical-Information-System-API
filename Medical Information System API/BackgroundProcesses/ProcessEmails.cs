@@ -16,7 +16,19 @@ namespace Medical_Information_System_API.BackgroundProcesses
 
         public async Task Execute(IJobExecutionContext context)
         {
-            _logger.LogError("aa");
+            await CheckInspections();
+            await CheckEmails();
+        }
+
+        private async Task CheckInspections()
+        {
+            //var potentialInspiredInspections = await _dbContext.Inspections
+            //    .Where(i => i.NextVisitDate);
+        }
+
+        private async Task CheckEmails()
+        {
+            
         }
     }
 }

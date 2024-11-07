@@ -27,7 +27,7 @@ namespace Medical_Information_System_API.Classes
         public List<Diagnose> Diagnoses { get; set; }
         public List<Consultation> Consultations { get; set; }
         public int Group { get; set; }
-
+         
         public Inspection()
         {
             Diagnoses = new List<Diagnose>();

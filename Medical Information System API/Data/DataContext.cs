@@ -23,6 +23,7 @@ namespace Medical_Information_System_API.Data
         public DbSet<Diagnose> Diagnoses { get; set; }
         public DbSet<Consultation> Consultations { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<InspiredInspection> InspiredInspections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -50,6 +51,9 @@ namespace Medical_Information_System_API.Data
             builder.Entity<Diagnose>().ToTable("diagnose");
             builder.Entity<Consultation>().ToTable("consultation");
             builder.Entity<Comment>().ToTable("comment");
+
+            builder.Entity<InspiredInspection>().HasKey(x => x.Id);
+            builder.Entity<InspiredInspection>().ToTable("inspiredInspection");
 
             base.OnModelCreating(builder);
         }
