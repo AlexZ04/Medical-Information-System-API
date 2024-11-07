@@ -340,10 +340,16 @@ namespace Medical_Information_System_API.Controllers
                 .Include(i => i.Consultations).ThenInclude(c => c.Comments)
                 .Where(x => x.Patient.Id == id);
 
-
-            if (icdRoots.Count > 0) inspFromContext = inspFromContext.
+            try
+            {
+                if (icdRoots.Count > 0) inspFromContext = inspFromContext.
                     Where(x => x.Diagnoses.Any(d => icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
                     d.Type == DiagnosisType.Main && d.Record.ParentId == null));
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
 
 
             if (grouped)

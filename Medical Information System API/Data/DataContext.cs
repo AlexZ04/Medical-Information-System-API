@@ -64,14 +64,14 @@ namespace Medical_Information_System_API.Data
         {
             var record = Icd10.Find(id);
             
-            if (record == null) throw new Exception("Record with this ID is not in the base...");
+            if (record == null) throw new ObjectDisposedException("Record with this ID is not in the base...");
 
             while (record?.ParentId != null)
             {
                 record = Icd10.Find(record.ParentId);
             }
 
-            if (record == null) throw new Exception("Error with founding parent ID...");
+            if (record == null) throw new ObjectDisposedException("Error with founding parent ID...");
 
             return record;
         }

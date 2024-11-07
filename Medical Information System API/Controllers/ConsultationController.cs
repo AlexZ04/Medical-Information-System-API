@@ -14,10 +14,12 @@ namespace Medical_Information_System_API.Controllers
     public class ConsultationController : Controller
     {
         private readonly DataContext _context;
+        private readonly ILogger<ConsultationController> _logger;
 
-        public ConsultationController(DataContext context)
+        public ConsultationController(DataContext context, ILogger<ConsultationController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
 
@@ -65,10 +67,16 @@ namespace Medical_Information_System_API.Controllers
                 .Include(i => i.Consultations).ThenInclude(c => c.Comments)
                 .Where(x => x.Doctor.Speciality == loginnedDoctor.Speciality);
 
-            if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d => 
-            icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
-            d.Type == DiagnosisType.Main && d.Record.ParentId == null));
-
+            try
+            {
+                if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d =>
+                    icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
+                    d.Type == DiagnosisType.Main && d.Record.ParentId == null));
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
 
             if (grouped)
             {

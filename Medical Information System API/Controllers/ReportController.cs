@@ -111,7 +111,7 @@ namespace Medical_Information_System_API.Controllers
                         rootsVisiting[rootCode]++;
                     }
                 }
-                catch (Exception ex)
+                catch (ObjectDisposedException ex)
                 {
                     _logger.LogError(ex.ToString());
                 }
