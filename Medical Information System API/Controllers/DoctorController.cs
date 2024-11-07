@@ -165,12 +165,12 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> EditProfile([FromBody] DoctorEditModel newDoctor)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            if (!ModelState.IsValid) return BadRequest();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 

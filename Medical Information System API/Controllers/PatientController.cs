@@ -185,19 +185,42 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateInspection(Guid id, [FromBody] InspectionCreateModel inspection)
         {
-           
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
 
+            if (!ModelState.IsValid) return BadRequest();
+
             var patient = await _context.Patients.FindAsync(id);
 
-            if (patient == null) return NotFound();
+            if (patient == null) return NotFound(new ResponseModel("Error", "Can't found patient with this Id"));
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
             if (loginnedDoctor == null) return Unauthorized();
+
+            if (inspection.Date > DateTime.Now.ToUniversalTime()) 
+                return BadRequest(new ResponseModel("Error", "Invalid inspection date"));
+
+            if (patient.HealthStatus == Conclusion.Death) 
+                return BadRequest(new ResponseModel("Error", "You can't inspect this patient anymore. It's too late"));
+
+            if (inspection.Conclusion == Conclusion.Death && inspection.DeathDate == null)
+                return BadRequest(new ResponseModel("Error", "DeathDate must be filled"));
+
+            if (inspection.Conclusion == Conclusion.Death && inspection.NextVisitDate != null) 
+                return BadRequest(new ResponseModel("Error", "Patient dead :("));
+
+            if (inspection.Conclusion != Conclusion.Death && inspection.DeathDate != null)
+                return BadRequest(new ResponseModel("Error", "Patient not dead!"));
+
+            if (inspection.Conclusion == Conclusion.Disease && inspection.NextVisitDate == null)
+                return BadRequest(new ResponseModel("Error", "NextVisitDate must be not null because of disease"));
+
+            if (inspection.NextVisitDate != null && (inspection.NextVisitDate < DateTime.Now.ToUniversalTime()
+                || inspection.NextVisitDate < inspection.Date))
+                return BadRequest(new ResponseModel("Error", "Invalid NextVisitDate value"));
 
 
             List<Diagnose> diagnosesList = new List<Diagnose>();
@@ -219,11 +242,15 @@ namespace Medical_Information_System_API.Controllers
 
             var inspectionId = Guid.NewGuid();
 
+            var spetialitiesList = new List<Guid>();
+
             foreach (var consultationModel in inspection.Consultations)
             {
                 var speciality = await _context.SpecialitiesList.FindAsync(consultationModel.SpecialityId);
 
                 if (speciality == null) return BadRequest();
+
+                spetialitiesList.Add(speciality.Id);
 
                 var commentModel = consultationModel.Comment;
                 var createComment = new Comment(commentModel, loginnedDoctor);
@@ -235,6 +262,11 @@ namespace Medical_Information_System_API.Controllers
                 consultationList.Add(createdConsultation);
                 _context.Consultations.Add(createdConsultation);
             }
+
+            var spetialitiesListDist = spetialitiesList.Distinct().ToList();
+
+            if (spetialitiesList.Count != spetialitiesListDist.Count) 
+                return BadRequest(new ResponseModel("Error", "One inspection can't have 2 consultations with doctors with one speciality"));
 
 
             int groupNumber = 0;

@@ -73,11 +73,11 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> EditInspection(Guid id, [FromBody] InspectionEditModel model)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            if (!ModelState.IsValid) return BadRequest();
 
             var insp = await _context.Inspections
                 .Include(x => x.Patient).Include(x => x.Doctor)
@@ -92,10 +92,36 @@ namespace Medical_Information_System_API.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
-            if (insp.Doctor.Id != new Guid(userId)) return Forbid(new ResponseModel("Error",
-                "User is not the inspection creator").ToString());
+            var response = new ResponseModel("Error", "User is not the inspection creator").ToString();
+
+            if (insp.Doctor.Id != new Guid(userId))
+            {
+                if (response != null) return Forbid(response);
+                else return Forbid();
+            }
 
             var patient = insp.Patient;
+
+
+            if (patient.HealthStatus == Conclusion.Death && insp.Conclusion != Conclusion.Death)
+                return BadRequest(new ResponseModel("Error", "Patient can't have 2 inspections with Death conslusion"));
+
+            if (model.Conclusion == Conclusion.Disease && model.NextVisitDate == null)
+                return BadRequest(new ResponseModel("Error", "NextVisitDate must be not null because of disease"));
+
+            if (model.Conclusion != Conclusion.Death && model.NextVisitDate != null)
+                return BadRequest(new ResponseModel("Error", "Patient not dead!"));
+
+            if (model.Conclusion == Conclusion.Death && model.NextVisitDate != null)
+                return BadRequest(new ResponseModel("Error", "Patient dead :("));
+
+            if (model.Conclusion == Conclusion.Death && model.DeathDate == null)
+                return BadRequest(new ResponseModel("Error", "DeathDate must be filled"));
+
+            if (model.NextVisitDate != null && (model.NextVisitDate < DateTime.Now.ToUniversalTime() || 
+                model.NextVisitDate < insp.Date))
+                return BadRequest(new ResponseModel("Error", "Invalid NextVisitDate value"));
+
 
             insp.Anamnesis = model.Anamnesis;
             insp.Complaints = model.Complaints;

@@ -170,12 +170,12 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> AddComment(Guid id, [FromBody] CommentCreateModel comment)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            if (!ModelState.IsValid) return BadRequest();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
@@ -221,12 +221,12 @@ namespace Medical_Information_System_API.Controllers
         [Authorize]
         public async Task<IActionResult> EditComment(Guid id, [FromBody] InspectionCommentCreateModel newComment)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.GetTokenAsync("access_token").Result;
 
             if (userId == null || token == null || !_context.CheckToken(token)) return Unauthorized();
+
+            if (!ModelState.IsValid) return BadRequest();
 
             var loginnedDoctor = await _context.Doctors.FindAsync(new Guid(userId));
 
