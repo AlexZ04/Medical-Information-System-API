@@ -9,7 +9,7 @@
 
         public InspiredInspection(Inspection inspection)
         {
-            Id = Guid.NewGuid();
+            Id = inspection.Id;
             Inspection = inspection;
             AddedTime = DateTime.Now.ToUniversalTime();
             SendedEmail = false;
