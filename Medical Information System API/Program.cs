@@ -87,14 +87,22 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddQuartz(options =>
 {
-    var jobKey = new JobKey(nameof(ProccessClearBlacklistDb));
+    var jobKeyBlacklist = new JobKey(nameof(ProcessClearBlacklistDb));
+    var jobKeyEmail = new JobKey(nameof(ProcessEmails));
 
     options
-        .AddJob<ProccessClearBlacklistDb>(jobKey)
+        .AddJob<ProcessClearBlacklistDb>(jobKeyBlacklist)
         .AddTrigger(
-            trigger => trigger.ForJob(jobKey).WithSimpleSchedule(
+            trigger => trigger.ForJob(jobKeyBlacklist).WithSimpleSchedule(
                 schedule => schedule.WithIntervalInHours(24).RepeatForever())
             );
+
+    options
+        .AddJob<ProcessEmails>(jobKeyEmail)
+        .AddTrigger(
+            trigger => trigger.ForJob(jobKeyEmail).WithSimpleSchedule(
+                schedule => schedule.WithIntervalInSeconds(10).RepeatForever())
+        );
 
 });
 

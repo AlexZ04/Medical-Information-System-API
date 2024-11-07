@@ -6,12 +6,12 @@ using Quartz;
 namespace Medical_Information_System_API.BackgroundProcesses
 {
     [DisallowConcurrentExecution]
-    public class ProccessClearBlacklistDb : IJob
+    public class ProcessClearBlacklistDb : IJob
     {
         private readonly DataContext _dbContext;
-        private readonly ILogger<ProccessClearBlacklistDb> _logger;
+        private readonly ILogger<ProcessClearBlacklistDb> _logger;
 
-        public ProccessClearBlacklistDb(DataContext dbContext, ILogger<ProccessClearBlacklistDb> logger)
+        public ProcessClearBlacklistDb(DataContext dbContext, ILogger<ProcessClearBlacklistDb> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
