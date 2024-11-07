@@ -41,10 +41,15 @@ namespace Medical_Information_System_API.Controllers
 
             if (name == null) name = "";
 
-            var consultationList = await _context.SpecialitiesList.OrderBy(c => c.Name).Where(c => c.Name.ToLower().Contains(name.ToLower()))
-                    .Skip((page - 1) * size).Take(size).ToListAsync();
+            var consultationList = await _context.SpecialitiesList
+                .OrderBy(s => s.Name)
+                .Where(s => s.Name.ToLower().Contains(name.ToLower()))
+                .Skip((page - 1) * size).Take(size)
+                .ToListAsync();
 
-            var amountOfRecords = await _context.SpecialitiesList.Where(c => c.Name.ToLower().Contains(name.ToLower())).CountAsync();
+            var amountOfRecords = await _context.SpecialitiesList
+                .Where(s => s.Name.ToLower().Contains(name.ToLower()))
+                .CountAsync();
             var count = (int) Math.Ceiling(amountOfRecords * 1.0 / size);
 
             if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
@@ -71,8 +76,10 @@ namespace Medical_Information_System_API.Controllers
 
             if (request == null) request = "";
 
-            var recordsData = _context.Icd10.OrderBy(d => d.Code).Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
-                d.Code.ToLower().Contains(request.ToLower()))
+            var recordsData = _context.Icd10
+                .OrderBy(r => r.Code)
+                .Where(r => r.Name.ToLower().StartsWith(request.ToLower()) ||
+                r.Code.ToLower().Contains(request.ToLower()))
                 .Skip((page - 1) * size).Take(size);
 
             var records = await recordsData.ToListAsync();
@@ -83,8 +90,10 @@ namespace Medical_Information_System_API.Controllers
                 diagnosesList.Add(new Icd10RecordModel { Code = record.Code, Id = record.Id, CreateTime = record.CreateTime, Name = record.Name });
             }
 
-            var amountOfDiagnoses = await _context.Icd10.Where(d => d.Name.ToLower().StartsWith(request.ToLower()) ||
-                d.Code.ToLower().Contains(request.ToLower())).CountAsync();
+            var amountOfDiagnoses = await _context.Icd10
+                .Where(r => r.Name.ToLower().StartsWith(request.ToLower()) ||
+                r.Code.ToLower().Contains(request.ToLower()))
+                .CountAsync();
             var count = (int)Math.Ceiling(amountOfDiagnoses * 1.0 / size);
 
             if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
@@ -105,7 +114,10 @@ namespace Medical_Information_System_API.Controllers
         [HttpGet("icd-10/roots")]
         public async Task<IActionResult> GetRootICDElements()
         {
-            var roots = await _context.Icd10.Where(x => x.ParentId == null).OrderBy(x => x.Code).ToListAsync();
+            var roots = await _context.Icd10
+                .Where(r => r.ParentId == null)
+                .OrderBy(r => r.Code)
+                .ToListAsync();
 
             var res = new List<Icd10RecordModel>();
             foreach (var root in roots)

@@ -51,7 +51,9 @@ namespace Medical_Information_System_API.Controllers
 
             if (icdRoots.Count() == 0)
             {
-                icdRootsCodes = await _context.Icd10.Where(i => i.ParentId == null).OrderBy(r => r.Code).Select(r => r.Code).ToListAsync();
+                icdRootsCodes = await _context.Icd10.Where(r => r.ParentId == null)
+                    .OrderBy(r => r.Code)
+                    .Select(r => r.Code).ToListAsync();
             }
             else
             {

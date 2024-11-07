@@ -280,7 +280,9 @@ namespace Medical_Information_System_API.Controllers
                 if (_context.Inspections.Count() == 0) groupNumber = 0;
                 else
                 {
-                    var lastAddedInsp = _context.Inspections.OrderByDescending(x => x.CreateTime).First();
+                    var lastAddedInsp = _context.Inspections
+                        .OrderByDescending(i => i.CreateTime)
+                        .First();
                     if (lastAddedInsp != null)
                     {
                         groupNumber = lastAddedInsp.Group + 1;
@@ -333,18 +335,15 @@ namespace Medical_Information_System_API.Controllers
             if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
 
             var inspFromContext = _context.Inspections
-                .Include(x => x.Patient)
-                .Include(x => x.Doctor)
-                .Include(x => x.Diagnoses)
-                    .ThenInclude(d => d.Record)
-                .Include(x => x.Consultations)
-                    .ThenInclude(c => c.Comments)
+                .Include(i => i.Patient).Include(i => i.Doctor)
+                .Include(i => i.Diagnoses).ThenInclude(d => d.Record)
+                .Include(i => i.Consultations).ThenInclude(c => c.Comments)
                 .Where(x => x.Patient.Id == id);
 
 
-            if (icdRoots.Count > 0) inspFromContext = inspFromContext.Where(x => x.Diagnoses.Any(d => 
-            icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
-            d.Type == DiagnosisType.Main && d.Record.ParentId == null));
+            if (icdRoots.Count > 0) inspFromContext = inspFromContext.
+                    Where(x => x.Diagnoses.Any(d => icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
+                    d.Type == DiagnosisType.Main && d.Record.ParentId == null));
 
 
             if (grouped)
@@ -363,7 +362,8 @@ namespace Medical_Information_System_API.Controllers
             bool hasChain = false, hasNested = false;
 
             foreach (var inspection in inspections) {
-                var childInsp = await _context.Inspections.FirstOrDefaultAsync(x => x.PreviousInspectionId == inspection.Id);
+                var childInsp = await _context.Inspections
+                    .FirstOrDefaultAsync(i => i.PreviousInspectionId == inspection.Id);
 
                 if (childInsp != null) {
                     hasNested = true;
@@ -447,14 +447,10 @@ namespace Medical_Information_System_API.Controllers
             request = request.ToLower();
 
             var inspections = await _context.Inspections
-                .Include(x => x.Patient)
-                .Include(x => x.Doctor)
-                .Include(x => x.Diagnoses)
-                    .ThenInclude(d => d.Record)
-                .Include(x => x.Consultations)
-                    .ThenInclude(c => c.Comments)
-                .Include(x => x.Consultations)
-                    .ThenInclude(c => c.Speciality)
+                .Include(i => i.Patient).Include(i => i.Doctor)
+                .Include(i => i.Diagnoses).ThenInclude(d => d.Record)
+                .Include(i => i.Consultations).ThenInclude(c => c.Comments)
+                .Include(i => i.Consultations).ThenInclude(c => c.Speciality)
 
                 .Where(x => x.Patient.Id == id && 
                     x.Diagnoses.Any(d => d.Record.Name.ToLower().StartsWith(request) || d.Record.Code.ToLower().Contains(request)))

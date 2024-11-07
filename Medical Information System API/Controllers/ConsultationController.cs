@@ -60,9 +60,9 @@ namespace Medical_Information_System_API.Controllers
 
 
             var inspList = _context.Inspections
-                .Include(x => x.Patient).Include(x => x.Doctor)
-                .Include(x => x.Diagnoses).ThenInclude(d => d.Record)
-                .Include(x => x.Consultations).ThenInclude(c => c.Comments)
+                .Include(i => i.Patient).Include(i => i.Doctor)
+                .Include(i => i.Diagnoses).ThenInclude(d => d.Record)
+                .Include(i => i.Consultations).ThenInclude(c => c.Comments)
                 .Where(x => x.Doctor.Speciality == loginnedDoctor.Speciality);
 
             if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d => 
@@ -73,7 +73,7 @@ namespace Medical_Information_System_API.Controllers
             if (grouped)
             {
                 inspList = inspList.
-                    OrderBy(x => x.Group).ThenBy(x => x.CreateTime);
+                    OrderBy(i => i.Group).ThenBy(i => i.CreateTime);
             }
 
 
