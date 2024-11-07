@@ -75,15 +75,36 @@ namespace Medical_Information_System_API.Controllers
         {
             if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
 
+            bool isCode = false;
+
             if (request == null) request = "";
 
-            var recordsData = _context.Icd10
-                .OrderBy(r => r.Code)
-                .Where(r => r.Name.ToLower().StartsWith(request.ToLower()) ||
-                r.Code.ToLower().Contains(request.ToLower()))
-                .Skip((page - 1) * size).Take(size);
+            request = request.ToLower();
 
-            var records = await recordsData.ToListAsync();
+            if (request.Length > 0)
+            {
+                if (request[0] >= 'a' && request[0] <= 'z')
+                {
+                    isCode = true;
+                }
+                else if (request[0] >= 'а' && request[0] <= 'я')
+                {
+                    isCode = false;
+                }
+            }
+
+            var records = new List<Icd10Record>();
+            if (isCode)
+            {
+                records = IcdDataManager.CodeTree.GetChildren(request);
+            }
+            else
+            {
+                records = IcdDataManager.NameTree.GetChildren(request);
+            }
+
+            var amountOfDiagnoses = records.Count;
+            records = records.Skip((page - 1) * size).Take(size).ToList();
 
             var diagnosesList = new List<Icd10RecordModel>();
             foreach (var record in records)
@@ -91,13 +112,9 @@ namespace Medical_Information_System_API.Controllers
                 diagnosesList.Add(new Icd10RecordModel { Code = record.Code, Id = record.Id, CreateTime = record.CreateTime, Name = record.Name });
             }
 
-            var amountOfDiagnoses = await _context.Icd10
-                .Where(r => r.Name.ToLower().StartsWith(request.ToLower()) ||
-                r.Code.ToLower().Contains(request.ToLower()))
-                .CountAsync();
             var count = (int)Math.Ceiling(amountOfDiagnoses * 1.0 / size);
 
-            if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
+            if (page > count && count > 0) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
 
             var answer = new Icd10SearchModel(diagnosesList, new PageInfoModel(size, count, page));
 
