@@ -3,6 +3,9 @@ using Medical_Information_System_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using System.Data;
+using System.Net;
+using System.Net.Http;
+using System.Net.Mail;
 
 namespace Medical_Information_System_API.BackgroundProcesses
 {
@@ -10,6 +13,7 @@ namespace Medical_Information_System_API.BackgroundProcesses
     {
         private readonly ILogger<ProcessEmails> _logger;
         private readonly DataContext _dbContext;
+        private readonly MailAddress _from = new MailAddress(MailData.EMAIL, "Medical MEGA Hospital");
         
         public ProcessEmails(ILogger<ProcessEmails> logger, DataContext dbContext)
         {
@@ -26,6 +30,11 @@ namespace Medical_Information_System_API.BackgroundProcesses
         private async Task CheckInspections()
         {
             var potentialInspiredInspections = _dbContext.Inspections
+                .Include(i => i.Patient).Include(i => i.Doctor)
+                .Include(i => i.Diagnoses).ThenInclude(d => d.Record)
+                .Include(i => i.Consultations).ThenInclude(c => c.Comments)
+                .Include(i => i.Consultations).ThenInclude(c => c.Speciality)
+
                 .Where(i => i.NextVisitDate != null &&
                     (DateTime.Now.ToUniversalTime() - (DateTime)i.NextVisitDate).TotalHours >= 1);
 
@@ -36,8 +45,6 @@ namespace Medical_Information_System_API.BackgroundProcesses
                 .Where(i => !_dbContext.InspiredInspections.Any(ii => ii.Id == i.Id));
 
             var potentialList = await potentialInspiredInspections.ToListAsync();
-
-            _logger.LogError(potentialList.Count.ToString());
 
             foreach (var potential in potentialList)
             {
@@ -50,6 +57,13 @@ namespace Medical_Information_System_API.BackgroundProcesses
         private async Task CheckEmails()
         {
             var queueToSend = await _dbContext.InspiredInspections
+                .Include(i => i.Inspection).ThenInclude(i => i.Patient)
+                .Include(i => i.Inspection).ThenInclude(i => i.Doctor)
+                .Include(i => i.Inspection).ThenInclude(i => i.Diagnoses).ThenInclude(d => d.Record)
+
+                .Include(i => i.Inspection).ThenInclude(i => i.Consultations).ThenInclude(c => c.Comments)
+                .Include(i => i.Inspection).ThenInclude(i => i.Consultations).ThenInclude(c => c.Speciality)
+
                 .Where(ii => ii.SendedEmail == false)
                 .ToListAsync();
 
@@ -63,7 +77,22 @@ namespace Medical_Information_System_API.BackgroundProcesses
 
         private async Task SendEmail(InspiredInspection inspectionData)
         {
+            MailAddress to = new MailAddress(inspectionData.Inspection.Doctor.Email);
+            MailMessage message = new MailMessage(_from, to);
 
+            message.Subject = "Пропущенный осмотр!";
+            message.Body = EmailManager.MakeEmailText(inspectionData);
+
+            message.IsBodyHtml = false;
+
+            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+            smtp.EnableSsl = true;
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtp.UseDefaultCredentials = false;
+            smtp.Timeout = 10000;
+            smtp.Credentials = new NetworkCredential(MailData.EMAIL, MailData.PASSWORD);
+
+            await smtp.SendMailAsync(message);
         }
     }
 }
