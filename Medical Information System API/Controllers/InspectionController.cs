@@ -102,6 +102,13 @@ namespace Medical_Information_System_API.Controllers
 
             var patient = insp.Patient;
 
+            if (model.Conclusion == Conclusion.Death)
+            {
+                if (insp.Date != patient.LastInspectionDate)
+                {
+                    return BadRequest(new ResponseModel("Error", "You can't send status to Death before another inspections"));
+                }
+            }
 
             if (patient.HealthStatus == Conclusion.Death && insp.Conclusion != Conclusion.Death)
                 return BadRequest(new ResponseModel("Error", "Patient can't have 2 inspections with Death conslusion"));
