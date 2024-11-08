@@ -47,6 +47,8 @@ namespace Medical_Information_System_API.Controllers
 
             if (token == null || !_context.CheckToken(token)) return Unauthorized();
 
+            if (start > end) return BadRequest(new ResponseModel("Error", "Invalid time interval"));
+
 
             List<string> icdRootsCodes = new List<string>();
 
