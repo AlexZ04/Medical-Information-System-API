@@ -200,6 +200,15 @@ namespace Medical_Information_System_API.Controllers
 
             if (loginnedDoctor == null) return Unauthorized();
 
+            if (inspection.PreviousInspectionId != null)
+            {
+                var prevInsp = _context.Inspections.Find(inspection.PreviousInspectionId);
+                if (prevInsp == null) return NotFound(new ResponseModel("Error", "Can't found previous inspection"));
+
+                if (inspection.Date <= prevInsp.Date) 
+                    return BadRequest(new ResponseModel("Error", "Child inspection can't be early than parent inspection"));
+            }
+
             if (inspection.Date > DateTime.Now.ToUniversalTime()) 
                 return BadRequest(new ResponseModel("Error", "Invalid inspection date"));
 
