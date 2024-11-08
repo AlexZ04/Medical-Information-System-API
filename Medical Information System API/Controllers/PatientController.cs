@@ -94,7 +94,8 @@ namespace Medical_Information_System_API.Controllers
                 var patientsId = await _context.Inspections
                     .Include(i => i.Patient).Include(i => i.Doctor)
                     .Where(i => i.Doctor.Id == userId)
-                    .Select(i => i.Patient.Id).Distinct().ToListAsync();
+                    .Select(i => i.Patient.Id).Distinct()
+                    .ToListAsync();
 
                 patientList = patientList.Where(p => patientsId.Contains(p.Id));
             }
@@ -112,7 +113,23 @@ namespace Medical_Information_System_API.Controllers
 
             if (conslusion != null && conslusion.Count > 0)
             {
-                patientList = patientList.Where(p => conslusion.Contains(p.HealthStatus));
+                var availablePatients = await _context.Inspections
+                    .Include(i => i.Patient)
+                    .Where(i => conslusion.Contains(i.Conclusion))
+                    .Select(i => i.Patient).Distinct()
+                    .ToListAsync();
+                
+                if (conslusion[0] == null)
+                {
+                    var patientsWithoutInsp = await _context.Patients
+                        .Where(p => 
+                        !_context.Inspections.Include(i => i.Patient).Any(i => i.Patient == p))
+                        .ToListAsync();
+
+                    availablePatients.AddRange(patientsWithoutInsp);
+                }
+
+                patientList = patientList.Where(p => availablePatients.Contains(p));
             }
 
 
