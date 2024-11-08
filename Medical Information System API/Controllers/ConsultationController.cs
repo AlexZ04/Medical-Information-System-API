@@ -118,7 +118,7 @@ namespace Medical_Information_System_API.Controllers
             var amount = await _context.Inspections.CountAsync();
             var count = (int)Math.Ceiling(amount * 1.0 / size);
 
-            if (page > count) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
+            if (page > count && count > 0) return BadRequest(new ResponseModel("Error", "Page number must be less than pages count"));
 
             var res = new InspectionPagedListModel(list, new PageInfoModel(size, count, page));
 
