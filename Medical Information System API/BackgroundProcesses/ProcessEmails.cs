@@ -9,6 +9,7 @@ using System.Net.Mail;
 
 namespace Medical_Information_System_API.BackgroundProcesses
 {
+    [DisallowConcurrentExecution]
     public class ProcessEmails : IJob
     {
         private readonly ILogger<ProcessEmails> _logger;

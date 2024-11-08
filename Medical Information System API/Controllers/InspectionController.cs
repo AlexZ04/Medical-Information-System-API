@@ -118,7 +118,7 @@ namespace Medical_Information_System_API.Controllers
             if (model.Conclusion == Conclusion.Death && model.DeathDate == null)
                 return BadRequest(new ResponseModel("Error", "DeathDate must be filled"));
 
-            if (model.NextVisitDate != null && (model.NextVisitDate < DateTime.Now.ToUniversalTime() || 
+            if (model.NextVisitDate != null && (model.NextVisitDate < DateTime.Now.ToUniversalTime() ||
                 model.NextVisitDate < insp.Date))
                 return BadRequest(new ResponseModel("Error", "Invalid NextVisitDate value"));
 

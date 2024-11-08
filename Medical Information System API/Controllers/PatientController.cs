@@ -80,6 +80,8 @@ namespace Medical_Information_System_API.Controllers
 
             if (name == null) name = "";
 
+            name = name.ToLower();
+
             var patientList = _context.Patients
                 .Where(p => p.Name.Contains(name));
 

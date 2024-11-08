@@ -10,6 +10,7 @@ namespace Medical_Information_System_API.Classes
                 $"Новый пропущенный осмотр!\n" +
                 $"Пациент: {insp.Inspection.Patient.Name}, дата рождения: {ConvertTime(insp.Inspection.Patient.Birthday ?? DateTime.MinValue)}\n" +
                 $"Время осмотра: {ConvertTime(insp.Inspection.NextVisitDate ?? DateTime.MinValue)}\n\n" +
+                $"Не забудьте с головой окунуться в медицину!\n\n" +
                 $"С уважением, администрация МЕГА поликлиники";
         }
 

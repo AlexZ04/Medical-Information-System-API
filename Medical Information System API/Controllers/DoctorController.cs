@@ -113,7 +113,7 @@ namespace Medical_Information_System_API.Controllers
             _context.BlacklistTokens.Add(tokenInBlacklist);
             await _context.SaveChangesAsync();
 
-            return Ok(new ResponseModel("Success", "Doctor log outed from system"));
+            return Ok(new ResponseModel("Success", "Doctor logged out from system"));
         }
 
 
