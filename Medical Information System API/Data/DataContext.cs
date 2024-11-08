@@ -25,6 +25,8 @@ namespace Medical_Information_System_API.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<InspiredInspection> InspiredInspections { get; set; }
 
+        public DbSet<ChildParentIcd> ChildParentIcd { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<DoctorDatabase>().HasKey(x => x.Id);
@@ -54,6 +56,9 @@ namespace Medical_Information_System_API.Data
 
             builder.Entity<InspiredInspection>().HasKey(x => x.Id);
             builder.Entity<InspiredInspection>().ToTable("inspiredInspection");
+
+            builder.Entity<ChildParentIcd>().HasKey(x => x.Id);
+            builder.Entity<ChildParentIcd>().ToTable("childParentIcd");
 
             base.OnModelCreating(builder);
         }

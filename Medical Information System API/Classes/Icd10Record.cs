@@ -12,6 +12,7 @@ namespace Medical_Information_System_API.Classes
         public DateTime CreateTime { get; set; }
         [AllowNull]
         public Guid? ParentId { get; set; }
+        public Guid RootId { get; set; }
 
         public Icd10Record(Icd10RecordModel model, Guid parentId)
         {

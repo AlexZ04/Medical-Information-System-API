@@ -1,5 +1,6 @@
 ﻿using Medical_Information_System_API.Classes;
 using Medical_Information_System_API.Data;
+using Medical_Information_System_API.IcdTree;
 using Medical_Information_System_API.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -368,6 +369,15 @@ namespace Medical_Information_System_API.Controllers
 
             if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
 
+            foreach (var icdRoot in icdRoots)
+            {
+                var record = _context.Icd10.Find(icdRoot);
+
+                if (record == null) return BadRequest(new ResponseModel("Error", "Can't find ICD-10 record"));
+
+                if (record.ParentId != null) return BadRequest(new ResponseModel("Error", "One or mode Guid's is not the root ICD"));
+            }
+
             var inspFromContext = _context.Inspections
                 .Include(i => i.Patient).Include(i => i.Doctor)
                 .Include(i => i.Diagnoses).ThenInclude(d => d.Record)
@@ -376,11 +386,12 @@ namespace Medical_Information_System_API.Controllers
 
             try
             {
+
                 if (icdRoots.Count > 0)
                 {
                     inspFromContext = inspFromContext.
-                    Where(i => i.Diagnoses.Any(d => icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
-                    d.Type == DiagnosisType.Main && d.Record.ParentId == null));
+                    Where(i => i.Diagnoses.Any(d => icdRoots.Contains(d.Record.RootId) &&
+                    d.Type == DiagnosisType.Main));
                 }
             }
             catch (ObjectDisposedException ex)

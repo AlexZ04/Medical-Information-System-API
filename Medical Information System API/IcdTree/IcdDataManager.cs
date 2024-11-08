@@ -25,7 +25,31 @@ namespace Medical_Information_System_API.IcdTree
             var icdData = await _context.Icd10.ToListAsync();
 
             CodeTree.Build(icdData, true);
-            NameTree.Build(icdData);       
+            NameTree.Build(icdData);
+
+            //await ChildParentIcd();
+        }
+
+        // мне стыдно за эту функцию
+        public async Task ChildParentIcd()
+        {
+            var data = await _context.Icd10.ToListAsync();
+
+            List<ChildParentIcd> res = new List<ChildParentIcd>();
+            foreach (var record in data) {
+
+                var rootId = _context.GetIcdParent(record.Id).Id;
+                res.Add(new ChildParentIcd { Id = record.Id, ParentId = rootId });
+
+                record.RootId = rootId;
+                await _context.SaveChangesAsync();
+            }
+
+            var allData = await _context.ChildParentIcd.ToListAsync();
+            _context.ChildParentIcd.RemoveRange(allData);
+            await _context.ChildParentIcd.AddRangeAsync(res);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

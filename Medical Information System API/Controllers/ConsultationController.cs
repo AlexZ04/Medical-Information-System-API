@@ -52,6 +52,15 @@ namespace Medical_Information_System_API.Controllers
 
             if (page <= 0 || size <= 0) return BadRequest(new ResponseModel("Error", "Invalid value for pagination"));
 
+            foreach (var icdRoot in icdRoots)
+            {
+                var record = _context.Icd10.Find(icdRoot);
+
+                if (record == null) return BadRequest(new ResponseModel("Error", "Can't find ICD-10 record"));
+
+                if (record.ParentId != null) return BadRequest(new ResponseModel("Error", "One or mode Guid's is not the root ICD"));
+            }
+
             loginnedDoctor.Password = "";
 
             foreach (var icdRoot in icdRoots)
@@ -69,9 +78,12 @@ namespace Medical_Information_System_API.Controllers
 
             try
             {
-                if (icdRoots.Count > 0) inspList = inspList.Where(x => x.Diagnoses.Any(d =>
-                    icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
-                    d.Type == DiagnosisType.Main && d.Record.ParentId == null));
+                if (icdRoots.Count > 0)
+                {
+                    inspList = inspList.
+                    Where(i => i.Diagnoses.Any(d => icdRoots.Contains(d.Record.RootId) &&
+                    d.Type == DiagnosisType.Main));
+                }
             }
             catch (ObjectDisposedException ex)
             {
