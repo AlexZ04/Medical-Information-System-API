@@ -122,6 +122,9 @@ namespace Medical_Information_System_API.Controllers
                 model.NextVisitDate < insp.Date))
                 return BadRequest(new ResponseModel("Error", "Invalid NextVisitDate value"));
 
+            if (model.Conclusion == Conclusion.Recovery && (model.NextVisitDate != null || model.DeathDate != null))
+                return BadRequest(new ResponseModel("Error", "Patient recovered"));
+
 
             insp.Anamnesis = model.Anamnesis;
             insp.Complaints = model.Complaints;
