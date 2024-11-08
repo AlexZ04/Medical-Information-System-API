@@ -377,7 +377,7 @@ namespace Medical_Information_System_API.Controllers
             try
             {
                 if (icdRoots.Count > 0) inspFromContext = inspFromContext.
-                    Where(x => x.Diagnoses.Any(d => icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
+                    Where(i => i.Diagnoses.Any(d => icdRoots.Contains(_context.GetIcdParent(d.Record.Id).Id) &&
                     d.Type == DiagnosisType.Main && d.Record.ParentId == null));
             }
             catch (ObjectDisposedException ex)
