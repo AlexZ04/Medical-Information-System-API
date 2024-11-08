@@ -253,6 +253,9 @@ namespace Medical_Information_System_API.Controllers
             if (inspection.Conclusion == Conclusion.Recovery && (inspection.NextVisitDate != null || inspection.DeathDate != null))
                 return BadRequest(new ResponseModel("Error", "Patient recovered"));
 
+            if (inspection.DeathDate != null && inspection.DeathDate > DateTime.Now.ToUniversalTime())
+                return BadRequest(new ResponseModel("Error", "Death date can't be later then now..."));
+
 
             List<Diagnose> diagnosesList = new List<Diagnose>();
 
@@ -275,7 +278,7 @@ namespace Medical_Information_System_API.Controllers
 
             var spetialitiesList = new List<Guid>();
 
-            foreach (var consultationModel in inspection.Consultations)
+            foreach (var consultationModel in inspection.Consultations ?? [])
             {
                 var speciality = await _context.SpecialitiesList.FindAsync(consultationModel.SpecialityId);
 
@@ -304,7 +307,7 @@ namespace Medical_Information_System_API.Controllers
             if (inspection.PreviousInspectionId != null)
             {
                 var parentId = _context.Inspections.Find(inspection.PreviousInspectionId);
-                groupNumber = parentId.Group;
+                groupNumber = parentId != null ? parentId.Group : 0;
             }
             else
             {

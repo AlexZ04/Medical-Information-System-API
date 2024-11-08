@@ -125,6 +125,9 @@ namespace Medical_Information_System_API.Controllers
             if (model.Conclusion == Conclusion.Recovery && (model.NextVisitDate != null || model.DeathDate != null))
                 return BadRequest(new ResponseModel("Error", "Patient recovered"));
 
+            if (model.DeathDate != null && model.DeathDate > DateTime.Now.ToUniversalTime())
+                return BadRequest(new ResponseModel("Error", "Death date can't be later then now..."));
+
 
             insp.Anamnesis = model.Anamnesis;
             insp.Complaints = model.Complaints;

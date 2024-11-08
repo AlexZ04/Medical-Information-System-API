@@ -154,6 +154,8 @@ namespace Medical_Information_System_API.Controllers
 
             if (cons == null) return NotFound();
 
+            cons.Comments = cons.Comments.OrderBy(c => c.CreateTime).ToList();
+
             return Ok(new ConsultationModel(cons));
         }
 
@@ -194,14 +196,21 @@ namespace Medical_Information_System_API.Controllers
                 .Include(c => c.Speciality)
                 .FirstOrDefault(c => c.Id == id);
 
-            if (consultation == null) return NotFound();
+            if (consultation == null) return NotFound(new ResponseModel("Error", "Consultation not found"));
 
             if (consultation.Speciality.Id != loginnedDoctor.Speciality &&
                 consultation.AuthorId != new Guid(userId)) return StatusCode(StatusCodes.Status406NotAcceptable);
 
+            var parentComment = _context.Comments.Find(comment.ParentId);
+            if (parentComment == null) return NotFound(new ResponseModel("Error", "Parent comment not found"));
+
+            if (!consultation.Comments.Contains(parentComment)) 
+                return BadRequest(new ResponseModel("Error", "Parent comment is not from current consultation"));
+
             var createComment = new Comment(comment, loginnedDoctor);
 
             _context.Comments.Add(createComment);
+            consultation.Comments.Add(createComment);
             await _context.SaveChangesAsync();
 
             loginnedDoctor.Password = "";
@@ -249,6 +258,7 @@ namespace Medical_Information_System_API.Controllers
             if (comment.Author.Id != new Guid(userId)) return StatusCode(StatusCodes.Status406NotAcceptable);
 
             comment.Content = newComment.Context;
+            comment.ModifiedDate = DateTime.Now.ToUniversalTime();
             await _context.SaveChangesAsync();
 
             loginnedDoctor.Password = "";
